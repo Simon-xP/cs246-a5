@@ -32,7 +32,7 @@ Hand Criteria::getStateC() const{
         }
     }
 }
-void Criteria::buy(PlayerData* p) override{
+void Criteria::buy(PlayerData* p) {
     if ((!owner || owner == p) && (greed < 3)){
         if  ((std::any_of(p->edges.begin(), p->edges.end(), [this](Goal* i){return std::find(ajacent.begin(), ajacent.end(), i);})) || (std::any_of(p->corners.begin(), p->corners.end(), [](auto i){return std::find(ajacent.begin(), ajacent.end(), i);}))){
             if (std::all_of(neighbours.begin(), neighbours.end(), [](Criteria* i){return !(i->owner);})){

@@ -27,6 +27,8 @@ class Criteria: public Object, public Subject{
         void notifyObservers();
         void gain(Producer r);
         Hand getStateC() const override;
+        int getStateD() const override { return 0; };
+        Producer getStateT() const override { return Producer{}; };
         void buy(PlayerData* p) override;
 };
 

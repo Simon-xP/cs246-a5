@@ -11,19 +11,22 @@ class Dice: public Subject{
         int getStateD() const override {
             return val;
         }
+        Hand getStateC() const override { return Hand{}; };
+        Producer getStateT() const override { return Producer{}; };
         void notifyObservers();
         void setValue(int num, PlayerData* p);
 };
 
 class Tile: public Observer, public Subject{
-    Dice* subject;
     std::vector <Observer*> observers;
+    enum tiles{NETFLIX, STUDY, LECTURE, TUTORIAL, LAB, CAFFEINE} ;
     protected:
-        Producer res;
         int dieVal;
         int pos;
         bool goosed;
     public:
+        Producer res;
+        Dice* subject;
         void notifyObservers();
         void notify() override{
             if (subject->getStateD() == dieVal) {
@@ -38,4 +41,6 @@ class Tile: public Observer, public Subject{
                 return Producer{};
             }
         }
+        int getStateD() const override { return 0; };
+        Hand getStateC() const override { return Hand{}; };
 };

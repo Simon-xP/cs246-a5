@@ -1,12 +1,12 @@
 #include <vector>
-enum Resource {CAFF, LAB, LEC, STD, TUT, UM};
+enum class Resource {CAFF, LAB, LEC, STD, TUT, UM};
 
 struct Hand {
     std::vector <Resource> cards;
 };
 
 struct Producer {
-    Resource prod = UM;
+    Resource prod = Resource::UM;
     int amount = 0;
 };
 
