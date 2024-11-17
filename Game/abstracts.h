@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <random>
 #include "constants.h"
 
 class Goal;
@@ -14,6 +15,8 @@ class Player{
     enum colors{BLUE, RED, GREEN, YELLOW} ;
     std::string Name;
     std::string password;
+    public:
+        Player(std::string name, std::string pass): Name{name}, password{pass}{}
 };
 
 struct Board {
@@ -39,8 +42,8 @@ class Observer {
 
 class PlayerData{
     public:
-        Hand* hand;
-        int points;
+        Hand* hand = new Hand{};
+        int points = 0;
         std::vector <Criteria* > corners;
         std::vector <Goal* > edges;
         Board* b;
@@ -52,6 +55,7 @@ class PlayerData{
         void turn();
         void writedata();
         void Discard();
+        void Trade();
 };
 
 class Object {
@@ -84,4 +88,4 @@ class Subject {
   virtual ~Subject() = default;
 };
 std::vector<Resource> *getTileOrder(std::mt19937 *gen);
-Board* generateBoard(std::string name, Player* players[4], PlayerData* data[4], std::mt19937 *gen);
+Board* generateBoard(std::string name, Player* players[4], std::mt19937 *gen);

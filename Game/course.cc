@@ -31,6 +31,7 @@ Hand Criteria::getStateC() const{
             hadd(&temp, last.prod);
         }
     }
+    return temp;
 }
 void Criteria::buy(PlayerData* p) {
     if ((!owner || owner == p) && (greed < 3)){

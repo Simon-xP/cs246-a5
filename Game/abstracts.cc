@@ -23,7 +23,7 @@ std::vector<Resource> *getTileOrder(std::mt19937 *gen) {
     return &vec;
 }
 
-Board* generateBoard(std::string name, Player* players[4], PlayerData* data[4], std::mt19937 *gen) {
+Board* generateBoard(std::string name, Player* players[4], std::mt19937 *gen) {
     Dice* d = new Dice();
     Goose* g = new Goose();
     auto tileorder = getTileOrder(gen);
@@ -188,7 +188,16 @@ Board* generateBoard(std::string name, Player* players[4], PlayerData* data[4], 
             }
         }
     }
-    return new Board{name, 0, players[0],players[1],players[2],players[3], data[0],data[1],data[2],data[3], b, a, c, d, gen, g};
+    PlayerData* p1 = new PlayerData{};
+    PlayerData* p2 = new PlayerData{};
+    PlayerData* p3 = new PlayerData{};
+    PlayerData* p4 = new PlayerData{};
+    Board* bor = new Board{name, 0, players[0],players[1],players[2],players[3], p1,p2,p3,p4, b, a, c, d, gen, g};
+    p1->b = bor;
+    p2->b = bor;
+    p3->b = bor;
+    p4->b = bor;
+    return bor;
 }
 
 void PlayerData::gain(Hand* h){
@@ -322,6 +331,26 @@ void PlayerData::turn() {
 
 void PlayerData::writedata(){
 
+}
+
+void PlayerData::Trade(){
+    Hand* slected_hand1 = new Hand{};
+    Hand* slected_hand2 = new Hand{};
+    if (std::all_of(hand->cards.begin(), hand->cards.end(), [this, slected_hand1](Resource i){return herr(hand, i)<herr(slected_hand1, i);})){
+        PlayerData* selected_player;
+        while (selected_player) {
+            if (std::all_of(selected_player->hand->cards.begin(), selected_player->hand->cards.end(), [selected_player, slected_hand2](Resource i){return herr(selected_player->hand, i)<herr(slected_hand2, i);})){
+                hsub(hand, slected_hand1);
+                hsub(selected_player->hand, slected_hand2);
+                hadd(hand, slected_hand2);
+                hadd(selected_player->hand, slected_hand1);
+            } else {
+                selected_player = nullptr;
+            }
+        }
+    }
+    delete slected_hand1;
+    delete slected_hand2;
 }
 
 void run_turn (Board* b) {
