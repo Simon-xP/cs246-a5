@@ -23,8 +23,8 @@ class Tile: public Observer, public Subject{
     protected:
         int dieVal;
         int pos;
-        bool goosed;
     public:
+        bool goosed;
         Producer res;
         Dice* subject;
         void notifyObservers();
@@ -38,7 +38,7 @@ class Tile: public Observer, public Subject{
             if (!goosed) {
             return res;
             } else {
-                return Producer{};
+                return Producer{Resource::UM, 1};
             }
         }
         int getStateD() const override { return 0; };

@@ -40,7 +40,10 @@ void Criteria::buy(PlayerData* p) {
                     for (auto i : cost.cards) {
                         hsub(p->hand, i);
                     }
-                    owner = p;
+                    if (!owner){
+                        owner = p;
+                        new courseobs(this, p);
+                    }
                     greed++;
                     cost = COSTS[greed];
                 }
@@ -51,9 +54,11 @@ void Criteria::buy(PlayerData* p) {
 
 
 
-courseobs::courseobs(Criteria* subject): subject{subject}{
+courseobs::courseobs(Criteria* subject, PlayerData* p): subject{subject}, owner{p}{
     subject->attach(this);
+    owner->eyes.emplace_back(this);
 }
+
 courseobs::~courseobs(){
     subject->detach(this);
 }
