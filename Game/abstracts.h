@@ -1,7 +1,11 @@
+#ifndef _ABSTRACT_H_
+#define _ABSTRACT_H_
 #include <vector>
 #include <string>
 #include <random>
 #include "constants.h"
+#include "obs.h"
+
 
 class Goal;
 class Criteria;
@@ -11,12 +15,18 @@ class Player;
 class Board;
 class Tile;
 
+class Goose { 
+    public:
+        Tile* tile = nullptr;
+        void move(Tile* target);
+};
+
 class Player{
     enum colors{BLUE, RED, GREEN, YELLOW} ;
-    std::string Name;
     std::string password;
     public:
-        Player(std::string name, std::string pass): Name{name}, password{pass}{}
+        std::string Name;
+        Player(std::string name, std::string pass): password{pass},  Name{name}{}
 };
 
 struct Board {
@@ -34,11 +44,7 @@ struct Board {
 
 void run_turn (Board* b);
 
-class Observer {
- public:
-  virtual void notify() = 0;
-  virtual ~Observer() = default;
-};
+
 
 class PlayerData{
     public:
@@ -49,43 +55,31 @@ class PlayerData{
         Board* b;
         std::vector <Observer* > eyes;
         bool can_steal = false;
-        void gain(Hand* h);
+        void gain(Hand h);
         void goosefy();
         void roll(Dice* d);
         void turn();
         void writedata();
         void Discard();
         void Trade();
+        ~PlayerData();
+        Tile* selectTargetTile();
+        PlayerData* selectPlayerToStealFrom(const std::vector<PlayerData*>& options);
+        void executeTrade(PlayerData* selectedPlayer, Hand* hand1, Hand* hand2);
+        bool hasResourcesForTrade(const Hand* selectedHand);
 };
 
 class Object {
     public:
         Hand cost;
         PlayerData* owner;
-        virtual ~Object();
-        virtual void buy(PlayerData* p) = 0;
+        virtual bool buy(PlayerData* p) = 0;
 };
 
-class Goose { 
-    public:
-        Tile* tile;
-        void move(Tile* target){
-            tile->goosed = false;
-            target->goosed = true;
-            tile = target;
-        }
-};
 
-class Subject {
-  std::vector<Observer*> observers;
- public:
-  void attach( Observer* o );
-  void detach( Observer* o );
-  void notifyObservers();
-  virtual Producer getStateT() const = 0;
-  virtual Hand getStateC() const = 0;
-  virtual int getStateD() const = 0;
-  virtual ~Subject() = default;
-};
-std::vector<Resource> *getTileOrder(std::mt19937 *gen);
+
+std::vector<Resource> getTileOrder(std::mt19937 *gen);
 Board* generateBoard(std::string name, Player* players[4], std::mt19937 *gen);
+void firstTurn(Board* board);
+
+#endif

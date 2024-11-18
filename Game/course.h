@@ -1,13 +1,15 @@
+#ifndef _COURSE_H_
+#define _COURSE_H_
 #include "abstracts.h"
 #include "constants.h"
 #include "tile.h"
 #include <algorithm>
-
+#include "obs.h"
 
 class tileobs: public Observer{
-        Tile* subject;
-        Criteria* owner;
+        Tile* subject;  
     public:
+        Criteria* owner;
         tileobs(Tile* subject);
         ~tileobs();
         void notify() override;
@@ -32,7 +34,9 @@ class Criteria: public Object, public Subject{
         Hand getStateC() const override;
         int getStateD() const override { return 0; };
         Producer getStateT() const override { return Producer{}; };
-        void buy(PlayerData* p) override;
+        bool buy(PlayerData* p) override;
+        bool buy_start(PlayerData* p);
+        ~Criteria() override;
 };
 
 class courseobs: public Observer{
@@ -47,7 +51,10 @@ class courseobs: public Observer{
 class Goal: public Object{
     public:
         Hand cost = {std::vector <Resource> {Resource::STD, Resource::TUT}};
-        std::vector <Object*> ajacent;
-        void buy(PlayerData* p) override;
+        std::vector <Goal*> ajacent1;
+        std::vector <Criteria*> ajacent2;
+        bool buy(PlayerData* p) override;
+        bool buy_start(PlayerData* p);
 };
 
+#endif

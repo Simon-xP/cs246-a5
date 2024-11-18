@@ -1,7 +1,9 @@
+#ifndef _TILE_H_
+#define _TILE_H_
 #include "constants.h"
+#include "obs.h"
 
 class PlayerData;
-class Observer;
 
 class Dice: public Subject{
     std::vector <Observer*> observers;
@@ -21,18 +23,14 @@ class Tile: public Observer, public Subject{
     std::vector <Observer*> observers;
     enum tiles{NETFLIX, STUDY, LECTURE, TUTORIAL, LAB, CAFFEINE} ;
     protected:
-        int dieVal;
         int pos;
     public:
+        int dieVal;
         bool goosed;
         Producer res;
         Dice* subject;
         void notifyObservers();
-        void notify() override{
-            if (subject->getStateD() == dieVal) {
-                notifyObservers();
-            }
-        }
+        void notify() override;
         void attach(Observer* o);
         Producer getStateT() const override{
             if (!goosed) {
@@ -43,4 +41,8 @@ class Tile: public Observer, public Subject{
         }
         int getStateD() const override { return 0; };
         Hand getStateC() const override { return Hand{}; };
+        ~Tile() override;
+        Tile(Dice* subject);
 };
+
+#endif
