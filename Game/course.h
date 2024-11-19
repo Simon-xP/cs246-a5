@@ -37,6 +37,7 @@ class Criteria: public Object, public Subject{
         bool buy(PlayerData* p) override;
         bool buy_start(PlayerData* p);
         ~Criteria() override;
+        int getgreed(){return greed;}
 };
 
 class courseobs: public Observer{

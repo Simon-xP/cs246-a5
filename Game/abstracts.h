@@ -22,9 +22,9 @@ class Goose {
 };
 
 class Player{
-    enum colors{BLUE, RED, GREEN, YELLOW} ;
     std::string password;
     public:
+        char colors[4] = {'B', 'R', 'G', 'Y'} ;
         std::string Name;
         Player(std::string name, std::string pass): password{pass},  Name{name}{}
 };
@@ -40,8 +40,9 @@ struct Board {
     Dice* dice;
     std::mt19937 *gen;
     Goose* goose;
+ 
 };
-
+void display(Board* b);
 void run_turn (Board* b);
 
 

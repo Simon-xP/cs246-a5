@@ -14,7 +14,6 @@ void Criteria::attach(Observer* o){
     observers.emplace_back(o);
 }
 void Criteria::notifyObservers() {
-    std::cout << "hoooo" << std::endl;
     for (auto i: observers){
         i->notify();
     }

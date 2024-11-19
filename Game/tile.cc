@@ -26,7 +26,6 @@ Tile::Tile(Dice* subject): subject{subject}{
 }
 
 void Tile::notifyObservers() {
-    std::cout << "pop" << std::endl;
     for (auto i: observers){
         i->notify();
     }
