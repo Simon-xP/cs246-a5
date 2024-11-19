@@ -623,7 +623,21 @@ void PlayerData::Trade() {
             return herr(hand, i) >= herr(selectedHand1, i);
         })) {
 
-        PlayerData* selectedPlayer = nullptr;
+        int selectedPlayeri = 0;
+
+        while (true) {
+        std::cout << "Enter the number corresponding to the player: ";
+        std::cin >> selectedPlayeri;
+
+        if (std::cin.fail() || selectedPlayeri < 0 || selectedPlayeri >= 4) {
+            std::cin.clear(); // Clear error flag
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore invalid input
+            std::cout << "Invalid input. Please enter a number between 0 and " << 3 << "." << std::endl;
+        } else {
+            break; // Valid input
+        }
+    }
+    PlayerData* selectedPlayer = b->data[selectedPlayeri];
         while (selectedPlayer) {
             if (std::all_of(selectedPlayer->hand->cards.begin(), selectedPlayer->hand->cards.end(), [selectedPlayer, selectedHand2](Resource i) {
                     return herr(selectedPlayer->hand, i) >= herr(selectedHand2, i);
