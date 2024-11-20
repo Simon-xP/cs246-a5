@@ -52,30 +52,30 @@ std::vector<int> getTileOrder2(std::mt19937 *gen) {
     return vec;
 }
 
-std::shared_ptr<Board> generateBoard(std::string name, Player* players[4], std::mt19937 *gen) {
+std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> players[4], std::shared_ptr<std::mt19937> gen) {
     std::shared_ptr<Dice> d = std::make_shared<Dice>();
     std::shared_ptr<Goose> g = std::make_shared<Goose>();
-    auto tileorder = getTileOrder(gen);
-    auto tileorder2 = getTileOrder2(gen);
+    auto tileorder = getTileOrder(gen.get());
+    auto tileorder2 = getTileOrder2(gen.get());
     int t = 0;
     int t2 = 0;
 
     // goals are edges, criterion are corners, tiles are T
 
-    std::vector<std::vector <std::shared_ptr<Tile>>> temp0;
+    std::vector<std::vector <Tile*>> temp0;
     
-    std::vector<std::vector <std::shared_ptr<Criteria>>> tempa;
+    std::vector<std::vector <Criteria*>> tempa;
     
-    std::vector <std::vector <std::shared_ptr<Goal>>> tempb;
+    std::vector <std::vector <Goal*>> tempb;
     std::vector <std::shared_ptr<Tile>> c;
     
    std::vector <std::shared_ptr<Criteria>> a;
     
    std::vector <std::shared_ptr<Goal>> b;
     for (int i = 0; i < BOARD_ROWS; ++i) {
-        std::vector <std::shared_ptr<Tile>> temp1;
-        std::vector <std::shared_ptr<Criteria>> temp3;
-        std::vector <std::shared_ptr<Goal>> temp4;
+        std::vector <Tile*> temp1;
+        std::vector <Criteria*> temp3;
+        std::vector <Goal*> temp4;
         for (int j = 0; j < BOARD_COLUMNS; ++j) {
             switch (layout.at(i).at(j))
             {
@@ -84,7 +84,7 @@ std::shared_ptr<Board> generateBoard(std::string name, Player* players[4], std::
                 std::shared_ptr<Criteria> w = std::make_shared<Criteria>();
                 temp1.emplace_back(nullptr);
                 temp4.emplace_back(nullptr);
-                temp3.emplace_back(w);
+                temp3.emplace_back(w.get());
                 a.emplace_back(w);
                 break;
             }
@@ -93,14 +93,14 @@ std::shared_ptr<Board> generateBoard(std::string name, Player* players[4], std::
                 std::shared_ptr<Goal> s = std::make_shared<Goal>();
                 temp1.emplace_back(nullptr);
                 temp3.emplace_back(nullptr);
-                temp4.emplace_back(s);
+                temp4.emplace_back(s.get());
                 b.emplace_back(s);
                 break;
             }
             case 'T':
             {
                 std::shared_ptr<Tile> q = std::make_shared<Tile>(d.get());
-                temp1.emplace_back(q);
+                temp1.emplace_back(q.get());
                 c.emplace_back(q);
                 temp3.emplace_back(nullptr);
                 temp4.emplace_back(nullptr);
@@ -126,75 +126,75 @@ std::shared_ptr<Board> generateBoard(std::string name, Player* players[4], std::
             case 'C':
                 if (j + 3 < BOARD_COLUMNS){
                     if (layout.at(i).at(j+3) == 'T') {
-                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i).at(j+3).get());
-                        v->owner =  tempa.at(i).at(j).get();
+                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i).at(j+3));
+                        v->owner =  tempa.at(i).at(j);
                         tempa.at(i).at(j)->eyes.emplace_back(v);
                     }
                 }
                 if (j - 3 >= 0){
                     if (layout.at(i).at(j-3) == 'T') {
-                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i).at(j-3).get());
-                        v->owner =  tempa.at(i).at(j).get();
+                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i).at(j-3));
+                        v->owner =  tempa.at(i).at(j);
                         tempa.at(i).at(j)->eyes.emplace_back(v);
                     }
                 }
                 if ((j + 1 < BOARD_COLUMNS) && (i + 2 < BOARD_ROWS)){
                     if (layout.at(i+2).at(j+1) == 'T') {
-                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i+2).at(j+1).get());
-                        v->owner =  tempa.at(i).at(j).get();
+                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i+2).at(j+1));
+                        v->owner =  tempa.at(i).at(j);
                         tempa.at(i).at(j)->eyes.emplace_back(v);
                     }
                 }
                 if ((j + 1 < BOARD_COLUMNS) && (i - 2 >= 0)){
                     if (layout.at(i-2).at(j+1) == 'T') {
-                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i-2).at(j+1).get());
-                        v->owner =  tempa.at(i).at(j).get();
+                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i-2).at(j+1));
+                        v->owner =  tempa.at(i).at(j);
                         tempa.at(i).at(j)->eyes.emplace_back(v);
                     }
                 }
                 if ((j - 1 >= 0) && (i + 2 < BOARD_ROWS)){
                     if (layout.at(i+2).at(j-1) == 'T') {
-                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i+2).at(j-1).get());
-                        v->owner =  tempa.at(i).at(j).get();
+                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i+2).at(j-1));
+                        v->owner =  tempa.at(i).at(j);
                         tempa.at(i).at(j)->eyes.emplace_back(v);
                     }
                 }
                 if ((j - 1 >= 0) && (i - 2 >= 0)){
                     if (layout.at(i-2).at(j-1) == 'T') {
-                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i-2).at(j-1).get());
-                        v->owner =  tempa.at(i).at(j).get();
+                        std::shared_ptr<tileobs> v = std::make_shared<tileobs>(temp0.at(i-2).at(j-1));
+                        v->owner =  tempa.at(i).at(j);
                         tempa.at(i).at(j)->eyes.emplace_back(v);
                     }
                 }
 
                 if (j + 2 < BOARD_COLUMNS){
                     if (layout.at(i).at(j+2) == 'C') {
-                        tempa.at(i).at(j+2)->neighbours.emplace_back(tempa.at(i).at(j).get());
+                        tempa.at(i).at(j+2)->neighbours.emplace_back(tempa.at(i).at(j));
                     }
                 }
                 if (j - 2 >= 0){
                     if (layout.at(i).at(j-2) == 'C') {
-                        tempa.at(i).at(j-2)->neighbours.emplace_back(tempa.at(i).at(j).get());
+                        tempa.at(i).at(j-2)->neighbours.emplace_back(tempa.at(i).at(j));
                     }
                 }
                 if ((j + 2 < BOARD_COLUMNS) && (i - 2 >= 0)){
                     if (layout.at(i-2).at(j+2) == 'C') {
-                    tempa.at(i-2).at(j+2)->neighbours.emplace_back(tempa.at(i).at(j).get());
+                    tempa.at(i-2).at(j+2)->neighbours.emplace_back(tempa.at(i).at(j));
                     }
                 }
                 if ((j -2 >= 0) && (i - 2 >= 0)){
                     if (layout.at(i-2).at(j-2) == 'C') {
-                        tempa.at(i-2).at(j-2)->neighbours.emplace_back(tempa.at(i).at(j).get());
+                        tempa.at(i-2).at(j-2)->neighbours.emplace_back(tempa.at(i).at(j));
                     }
                 }
                 if ((j + 2 < BOARD_COLUMNS) && (i + 2 < BOARD_ROWS)){
                     if (layout.at(i+2).at(j+2) == 'C') {
-                        tempa.at(i+2).at(j+2)->neighbours.emplace_back(tempa.at(i).at(j).get());
+                        tempa.at(i+2).at(j+2)->neighbours.emplace_back(tempa.at(i).at(j));
                     }
                 }
                 if ((j - 2 >= 0) && (i + 2 < BOARD_ROWS)){
                     if (layout.at(i+2).at(j-2) == 'C') {
-                        tempa.at(i+2).at(j-2)->neighbours.emplace_back(tempa.at(i).at(j).get());
+                        tempa.at(i+2).at(j-2)->neighbours.emplace_back(tempa.at(i).at(j));
                     }
                 }
 
@@ -204,36 +204,36 @@ std::shared_ptr<Board> generateBoard(std::string name, Player* players[4], std::
                 for (int k = -1; k < 2; ++k) {
                     if ((j + 1 < BOARD_COLUMNS) && (i + k < BOARD_ROWS) && (i + k >= 0)){
                         if (layout.at(i+k).at(j+1) == 'C') {
-                            tempa.at(i+k).at(j+1)->ajacent.emplace_back(tempb.at(i).at(j).get());
-                            tempb.at(i).at(j)->ajacent2.emplace_back(tempa.at(i+k).at(j+1).get());
+                            tempa.at(i+k).at(j+1)->ajacent.emplace_back(tempb.at(i).at(j));
+                            tempb.at(i).at(j)->ajacent2.emplace_back(tempa.at(i+k).at(j+1));
                         }
                     }
                     if ((j - 1 >= 0) && (i + k < BOARD_ROWS)&& (i + k >= 0)){
                         if (layout.at(i+k).at(j-1) == 'C') {
-                            tempa.at(i+k).at(j-1)->ajacent.emplace_back(tempb.at(i).at(j).get());
-                            tempb.at(i).at(j)->ajacent2.emplace_back(tempa.at(i+k).at(j-1).get());
+                            tempa.at(i+k).at(j-1)->ajacent.emplace_back(tempb.at(i).at(j));
+                            tempb.at(i).at(j)->ajacent2.emplace_back(tempa.at(i+k).at(j-1));
                         }
                     }
                 }
 
                 if ((j + 2 < BOARD_COLUMNS) && (i + 1 < BOARD_ROWS)){
                     if (layout.at(i+1).at(j+2) == 'E') {
-                        tempb.at(i+1).at(j+2)->ajacent1.emplace_back(tempb.at(i).at(j).get());
+                        tempb.at(i+1).at(j+2)->ajacent1.emplace_back(tempb.at(i).at(j));
                     }
                 }
                 if ((j - 2 >= 0) && (i + 1 < BOARD_ROWS)){
                     if (layout.at(i+1).at(j-2) == 'E') {
-                        tempb.at(i+1).at(j-2)->ajacent1.emplace_back(tempb.at(i).at(j).get());
+                        tempb.at(i+1).at(j-2)->ajacent1.emplace_back(tempb.at(i).at(j));
                     }
                 }
                 if ((j + 2 < BOARD_COLUMNS) && (i - 1 >= 0)){
                     if (layout.at(i-1).at(j+2) == 'E') {
-                        tempb.at(i-1).at(j+2)->ajacent1.emplace_back(tempb.at(i).at(j).get());
+                        tempb.at(i-1).at(j+2)->ajacent1.emplace_back(tempb.at(i).at(j));
                     }
                 }
                 if ((j - 2 >= 0) && (i - 1 >= 0)){
                     if (layout.at(i-1).at(j-2) == 'E') {
-                        tempb.at(i-1).at(j-2)->ajacent1.emplace_back(tempb.at(i).at(j).get());
+                        tempb.at(i-1).at(j-2)->ajacent1.emplace_back(tempb.at(i).at(j));
                     }
                 }
 
@@ -252,15 +252,10 @@ std::shared_ptr<Board> generateBoard(std::string name, Player* players[4], std::
             }
         }
     }
-    std::shared_ptr<PlayerData> p1 = std::make_shared<PlayerData>();
-    std::shared_ptr<PlayerData> p2 = std::make_shared<PlayerData>();
-    std::shared_ptr<PlayerData> p3 = std::make_shared<PlayerData>();
-    std::shared_ptr<PlayerData> p4 = std::make_shared<PlayerData>();
-    std::shared_ptr<Board> bor(new Board{name, 0, players[0],players[1],players[2],players[3],p1,p2,p3,p4 , b, a, c, d, gen, g});
-    p1->b = bor.get();
-    p2->b = bor.get();
-    p3->b = bor.get();
-    p4->b = bor.get();
+    std::shared_ptr<Board> bor(new Board{name, 0, players[0],players[1],players[2],players[3],std::make_shared<PlayerData>(),std::make_shared<PlayerData>(),std::make_shared<PlayerData>(),std::make_shared<PlayerData>() , b, a, c, d, gen, g});
+    for (auto i : bor->data){
+        i->b = bor.get();
+    }
     return bor;
 }
 
@@ -285,7 +280,7 @@ void PlayerData::gain(Hand h){
     }
 }
 
-Tile* PlayerData::selectTargetTile() {
+    Tile* PlayerData::selectTargetTile() {
     int targetIndex = -1;
 
     // Input loop to ensure a valid number between 0 and 18 is selected
@@ -398,7 +393,7 @@ void PlayerData::turn() {
 
     // Start the player's turn by rolling the dice
     roll(b->dice.get());
-    Player *play = b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [this](const std::shared_ptr<PlayerData>& p) {return p.get() == this;}))];
+    Player *play = b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [this](const std::shared_ptr<PlayerData>& p) {return p.get() == this;}))].get();
 
     std::cout << "\n--- Player " << play->Name << "'s Turn ---" << std::endl;
     std::cout << "ROLL:" << b->dice->val << std::endl;
@@ -482,7 +477,7 @@ void PlayerData::turn() {
 void firstTurn(Board* b) {
     for (int i = 0; i < 4; ++i) {
         PlayerData* player = b->data[i].get();
-        Player* play = b->players[i];
+        Player* play = b->players[i].get();
         
         std::cout << "\n--- Player " << play->Name << "'s Setup Turn ---" << std::endl;
 
@@ -510,10 +505,8 @@ void firstTurn(Board* b) {
         // Display adjacent goals for the selected criteria
         std::cout << "Adjacent Goals:\n";
         std::vector<Goal*> adjacentGoals;
-        for (auto* goal : chosenCriteria->ajacent) {
-            if (!goal->owner) {
+        for (Goal* goal : chosenCriteria->ajacent) {
                 adjacentGoals.push_back(goal);
-            }
         }
 
         if (adjacentGoals.empty()) {
@@ -699,10 +692,87 @@ void run_turn (Board* b) {
 }
 
 PlayerData::~PlayerData(){
+    corners.clear();
+    edges.clear();
+    eyes.clear();
+    hand.reset();
+
 }
 
-Board::~Board(){
-        delete gen;
+Board::~Board() {
+
+    // Reset all smart pointers and clear containers explicitly (optional)
+    for (auto& player : players) {
+        if (player){
+        player.reset(); // Reset shared_ptr to release the ownership
+        }
+    }
+
+    for (auto& datum : data) {
+        if (datum) {
+        datum.reset();
+        }
+    }
+   for (auto& datum : goals) {
+                if (datum) {
+        datum.reset();
+        }
+    }
+   for (auto& datum : criterions) {
+               if (datum) {
+        for (auto& datun : datum->eyes){
+            if (datun) {
+                datun.reset();
+            }
+        }
+        datum.reset();
+        }
+    }
+   for (auto& datum : tiles) {
+                if (datum) {
+        datum.reset();
+        }
+    }
+
+    goals.clear();       // Clear the vector of shared_ptr, releasing objects
+    criterions.clear();  // Clear the vector of shared_ptr, releasing objects
+    tiles.clear();       // Clear the vector of shared_ptr, releasing objects
+
+}
+
+Goose::~Goose(){
+    tile = nullptr;
+}
+
+void PlayerData::detach(Observer* o){
+    if (eyes.size()) {
+    for (auto it = eyes.begin(); it != eyes.end(); ++it) {
+        if ((*it).get() == o) {
+            eyes.erase(it);
+            break;
+        }
+    }
+    }
+}
+void PlayerData::detach(Goal* o){
+    // if (edges.size()) {
+    // for (auto it = edges.begin(); it != edges.end(); ++it) {
+    //     if ((*it) == o) {
+    //         edges.erase(it);
+    //          break;
+    //     }
+    // }
+    // }
+}
+void PlayerData::detach(Criteria* o){
+    // if (corners.size()) {
+    // for (auto it = corners.begin(); it != corners.end(); ++it) {
+    //     if ((*it) == o) {
+    //         corners.erase(it);
+    //         break;
+    //     }
+    // }
+    // }
 }
 
 

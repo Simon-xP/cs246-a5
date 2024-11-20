@@ -34,7 +34,7 @@ Hand Criteria::getStateC() const{
 }
 bool Criteria::buy(PlayerData* p) {
     if ((!owner || owner == p) && (greed < 3)){
-        if  ((std::any_of(p->edges.begin(), p->edges.end(), [this](Goal* i){return std::find(ajacent.begin(), ajacent.end(), i) != ajacent.end();}))){
+        if  ((std::any_of(p->edges.begin(), p->edges.end(), [this](Goal* i){return std::find_if(ajacent.begin(), ajacent.end(), [i](Goal* x){return i == x;}) != ajacent.end();}))){
             if (std::all_of(neighbours.begin(), neighbours.end(), [](Criteria* i){return !(i->owner);})){
                 if (std::all_of(p->hand->cards.begin(), p->hand->cards.end(), [p, this](Resource i){return herr(p->hand.get(), i)<herr(&cost, i);})) {
                     for (auto i : cost.cards) {
@@ -75,12 +75,15 @@ courseobs::courseobs(Criteria* subject, PlayerData* p): subject{subject}, owner{
 }
 
 void courseobs::notify(){
-    owner->gain(subject->getStateC());
+    auto x = owner;
+    auto y = subject;
+    x->gain(y->getStateC());
 }
 
 bool Goal::buy(PlayerData* p){
     if (!owner) {
-        if  ((std::any_of(p->corners.begin(), p->corners.end(), [this](Criteria* i){return std::find(ajacent2.begin(), ajacent2.end(), i) != ajacent2.end();})) || (std::any_of(p->edges.begin(), p->edges.end(), [this](Goal* j){return std::find(ajacent1.begin(), ajacent1.end(), j) != ajacent1.end();}))){
+        if  (std::any_of(p->corners.begin(), p->corners.end(), [this, p](Criteria* i){return std::find_if(ajacent2.begin(), ajacent2.end(), [i](Criteria* x){return i == x;}) != ajacent2.end();}) || 
+        std::any_of(p->edges.begin(), p->edges.end(), [this](Goal* j){return std::find_if(ajacent1.begin(), ajacent1.end(), [j](Goal* x){return j == x;}) != ajacent1.end();})){
             if (std::all_of(p->hand->cards.begin(), p->hand->cards.end(), [p, this](Resource i){return herr(p->hand.get(), i)<herr(&cost, i);})) {
                 for (auto i : cost.cards) {
                     hsub(p->hand.get(), i);
@@ -103,27 +106,64 @@ bool Goal::buy_start(PlayerData* p){
     return false;
 }
 
-
-Criteria::~Criteria(){
-    for (auto i: observers){
-        detach(i.get());
+void Criteria::detach(courseobs* o){
+    // if (observers.size()) {
+    // for (auto it = observers.begin(); it != observers.end(); ++it) {
+    //     if ((*it) == o) {
+    //         observers.erase(it);
+    //          break;
+    //     }
+    // }
+    // }
+}
+void Criteria::detach(tileobs* o){
+    if (eyes.size()) {
+    for (auto it = eyes.begin(); it != eyes.end(); ++it) {
+        if ((*it).get() == o) {
+            eyes.erase(it);
+             break;
+        }
     }
- }
-
-tileobs::~tileobs() {
-    if (subject) {
-        subject->detach(this); // Detach the observer from the subject
     }
-    // Nullify or reset pointers if necessary
-    subject = nullptr;
+}
+
+Goal::~Goal(){
+    ajacent1.clear();
+    ajacent2.clear();
+        if (owner){
+    owner->detach(this);
+    }
     owner = nullptr;
 }
 
-courseobs::~courseobs() {
-    if (subject) {
-        subject->detach(this); // Detach the observer from the subject
+Criteria::~Criteria(){
+    observers.clear();
+    eyes.clear();
+    ajacent.clear();
+    neighbours.clear();
+    tiles.clear();
+        if (owner){
+    owner->detach(this);
     }
-    // Nullify or reset pointers if necessary
+    owner = nullptr;
+}
+courseobs::~courseobs(){
+    if (subject){
+    subject->detach(this);
+    }
+    if (owner){
+    owner->detach(this);
+    }
+    subject = nullptr;
+    owner = nullptr;
+}
+tileobs::~tileobs(){
+    if (subject){
+    subject->detach(this);
+    }
+    if (owner){
+    owner->detach(this);
+    }
     subject = nullptr;
     owner = nullptr;
 }

@@ -2,6 +2,7 @@
 #define _OBS_H_
 #include <vector>
 #include "constants.h"
+#include <memory>
 
 class Observer {
  public:
@@ -13,7 +14,8 @@ class Subject {
   std::vector<Observer*> observers;
  public:
   void attach( Observer* o );
-  void detach( Observer* o );
+  
+  void detach(Observer* o );
   void notifyObservers();
   virtual Producer getStateT() const = 0;
   virtual Hand getStateC() const = 0;

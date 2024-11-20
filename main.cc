@@ -10,10 +10,10 @@ int main() {
     std::shared_ptr<Player> player2 = std::make_shared<Player>("me", "qwert");
     std::shared_ptr<Player> player3 = std::make_shared<Player>("me", "qwert");
     std::shared_ptr<Player> player4 = std::make_shared<Player>("me", "qwert");
-    Player* players[4] = {player1.get(), player2.get(), player3.get(), player4.get()};
+    std::shared_ptr<Player> players[4] = {player1, player2, player3, player4};
     int seed = 10;
     std::mt19937 gen(seed);
-    std::shared_ptr<Board> b = generateBoard("main", players, &gen);
+    std::shared_ptr<Board> b = generateBoard("main", players, std::shared_ptr<std::mt19937>(&gen));
     firstTurn(b.get());
     while (std::all_of(b->data, b->data+3, [](std::shared_ptr<PlayerData> x){return x->points < 10;})) {
         run_turn(b.get());

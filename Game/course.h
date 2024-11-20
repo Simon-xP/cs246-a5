@@ -7,17 +7,19 @@
 #include "obs.h"
 #include <memory>
 
+class courseobs;
+
 class tileobs: public Observer{
         Tile* subject;  
     public:
         Criteria* owner;
         tileobs(Tile* subject);
-        ~tileobs();
         void notify() override;
+        ~tileobs() override;
 };
 
 class Criteria: public Object, public Subject{
-    std::vector <std::shared_ptr<Observer>> observers;
+    std::vector <Observer*> observers;
     Hand COSTS[3] = {Hand{std::vector <Resource> {Resource::CAFF, Resource::TUT, Resource::LEC, Resource::LAB}}, 
     Hand{std::vector <Resource> {Resource::STD, Resource::LEC, Resource::LEC,Resource::STD,Resource::STD}},
     Hand{std::vector <Resource> {Resource::CAFF,Resource::CAFF,Resource::CAFF,Resource::LAB, Resource::LAB,Resource::LEC,Resource::LEC, Resource::TUT, Resource::STD, Resource::STD}}};
@@ -25,11 +27,14 @@ class Criteria: public Object, public Subject{
         int greed = 0;
         Producer last;
     public:
+        ~Criteria() override;
         std::vector <std::shared_ptr<Observer>> eyes;
         std::vector <Criteria*> neighbours;
         std::vector <Goal*> ajacent;
         std::vector <Tile*> tiles;
         void attach(Observer* o);
+        void detach(tileobs* o);
+        void detach(courseobs* o);
         void notifyObservers();
         void gain(Producer r);
         Hand getStateC() const override;
@@ -37,7 +42,6 @@ class Criteria: public Object, public Subject{
         Producer getStateT() const override { return Producer{}; };
         bool buy(PlayerData* p) override;
         bool buy_start(PlayerData* p);
-        ~Criteria() override;
         int getgreed(){return greed;}
 };
 
@@ -46,8 +50,8 @@ class courseobs: public Observer{
     PlayerData* owner;
     public:
         courseobs(Criteria* subject, PlayerData* p);
-        ~courseobs();
         void notify() override;
+        ~courseobs() override;
 };
 
 class Goal: public Object{
@@ -57,6 +61,7 @@ class Goal: public Object{
         std::vector <Criteria*> ajacent2;
         bool buy(PlayerData* p) override;
         bool buy_start(PlayerData* p);
+        ~Goal();
 };
 
 #endif

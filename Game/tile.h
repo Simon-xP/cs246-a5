@@ -2,6 +2,7 @@
 #define _TILE_H_
 #include "constants.h"
 #include "obs.h"
+#include <memory>
 
 class PlayerData;
 
@@ -17,6 +18,7 @@ class Dice: public Subject{
         Producer getStateT() const override { return Producer{}; };
         void notifyObservers();
         void setValue(int num, PlayerData* p);
+        ~Dice() override;
 };
 
 class Tile: public Observer, public Subject{
@@ -31,7 +33,7 @@ class Tile: public Observer, public Subject{
         Dice* subject;
         void notifyObservers();
         void notify() override;
-        void attach(Observer* o);
+        void attach(Observer*);
         Producer getStateT() const override{
             if (!goosed) {
             return res;
