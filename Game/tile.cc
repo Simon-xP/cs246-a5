@@ -45,4 +45,5 @@ Tile::~Tile(){
     for (auto i: observers){
         detach(i);
     }
+    
  }

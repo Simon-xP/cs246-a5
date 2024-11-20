@@ -25,8 +25,8 @@ class Tile: public Observer, public Subject{
     protected:
         int pos;
     public:
-        int dieVal;
-        bool goosed;
+        int dieVal = -1;
+        bool goosed = false;
         Producer res;
         Dice* subject;
         void notifyObservers();

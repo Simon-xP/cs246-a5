@@ -1,5 +1,6 @@
 #include "course.h"
 #include <iostream>
+#include <memory>
 
 
 tileobs::tileobs(Tile* subject): subject{subject}{
@@ -35,13 +36,13 @@ bool Criteria::buy(PlayerData* p) {
     if ((!owner || owner == p) && (greed < 3)){
         if  ((std::any_of(p->edges.begin(), p->edges.end(), [this](Goal* i){return std::find(ajacent.begin(), ajacent.end(), i) != ajacent.end();}))){
             if (std::all_of(neighbours.begin(), neighbours.end(), [](Criteria* i){return !(i->owner);})){
-                if (std::all_of(p->hand->cards.begin(), p->hand->cards.end(), [p, this](Resource i){return herr(p->hand, i)<herr(&cost, i);})) {
+                if (std::all_of(p->hand->cards.begin(), p->hand->cards.end(), [p, this](Resource i){return herr(p->hand.get(), i)<herr(&cost, i);})) {
                     for (auto i : cost.cards) {
-                        hsub(p->hand, i);
+                        hsub(p->hand.get(), i);
                     }
                     if (!owner){
                         owner = p;
-                        new courseobs(this, p);
+                        p->eyes.emplace_back(std::make_shared<courseobs>(this,p));
                     }
                     greed++;
                     cost = COSTS[greed];
@@ -58,7 +59,7 @@ bool Criteria::buy_start(PlayerData* p) {
     if (!owner){
         if (std::all_of(neighbours.begin(), neighbours.end(), [](Criteria* i){return !(i->owner);})){
             owner = p;
-            new courseobs(this, p);
+            p->eyes.emplace_back(std::make_shared<courseobs>(this,p));
             greed++;
             cost = COSTS[greed];
             p->points++;
@@ -71,7 +72,6 @@ bool Criteria::buy_start(PlayerData* p) {
 
 courseobs::courseobs(Criteria* subject, PlayerData* p): subject{subject}, owner{p}{
     subject->attach(this);
-    owner->eyes.emplace_back(this);
 }
 
 void courseobs::notify(){
@@ -81,9 +81,9 @@ void courseobs::notify(){
 bool Goal::buy(PlayerData* p){
     if (!owner) {
         if  ((std::any_of(p->corners.begin(), p->corners.end(), [this](Criteria* i){return std::find(ajacent2.begin(), ajacent2.end(), i) != ajacent2.end();})) || (std::any_of(p->edges.begin(), p->edges.end(), [this](Goal* j){return std::find(ajacent1.begin(), ajacent1.end(), j) != ajacent1.end();}))){
-            if (std::all_of(p->hand->cards.begin(), p->hand->cards.end(), [p, this](Resource i){return herr(p->hand, i)<herr(&cost, i);})) {
+            if (std::all_of(p->hand->cards.begin(), p->hand->cards.end(), [p, this](Resource i){return herr(p->hand.get(), i)<herr(&cost, i);})) {
                 for (auto i : cost.cards) {
-                    hsub(p->hand, i);
+                    hsub(p->hand.get(), i);
                 }
                 p->edges.emplace_back(this);
                 owner = p;
@@ -105,11 +105,8 @@ bool Goal::buy_start(PlayerData* p){
 
 
 Criteria::~Criteria(){
-    for (auto i: eyes){
-        delete i;
-    }
     for (auto i: observers){
-        detach(i);
+        detach(i.get());
     }
  }
 

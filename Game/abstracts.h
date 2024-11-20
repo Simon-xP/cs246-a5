@@ -5,6 +5,7 @@
 #include <random>
 #include "constants.h"
 #include "obs.h"
+#include <memory>
 
 
 class Goal;
@@ -33,13 +34,14 @@ struct Board {
     std::string name;
     int turn = 0;
     Player* players[4];
-    PlayerData* data[4];
-    std::vector <Goal*> goals;
-    std::vector <Criteria*> criterions;
-    std::vector <Tile*> tiles;
-    Dice* dice;
+    std::shared_ptr<PlayerData> data[4];
+    std::vector <std::shared_ptr<Goal>> goals;
+    std::vector <std::shared_ptr<Criteria>> criterions;
+    std::vector <std::shared_ptr<Tile>> tiles;
+    std::shared_ptr<Dice> dice;
     std::mt19937 *gen;
-    Goose* goose;
+    std::shared_ptr<Goose> goose;
+    ~Board();
  
 };
 void display(Board* b);
@@ -49,12 +51,12 @@ void run_turn (Board* b);
 
 class PlayerData{
     public:
-        Hand* hand = new Hand{};
+        std::unique_ptr<Hand> hand = std::make_unique<Hand>();
         int points = 0;
         std::vector <Criteria* > corners;
         std::vector <Goal* > edges;
         Board* b;
-        std::vector <Observer* > eyes;
+        std::vector <std::shared_ptr<Observer>> eyes;
         bool can_steal = false;
         void gain(Hand h);
         void goosefy();
@@ -80,7 +82,7 @@ class Object {
 
 
 std::vector<Resource> getTileOrder(std::mt19937 *gen);
-Board* generateBoard(std::string name, Player* players[4], std::mt19937 *gen);
+std::shared_ptr<Board> generateBoard(std::string name, Player* players[4], std::mt19937 *gen);
 void firstTurn(Board* board);
 
 #endif

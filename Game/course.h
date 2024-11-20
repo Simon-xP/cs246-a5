@@ -5,6 +5,7 @@
 #include "tile.h"
 #include <algorithm>
 #include "obs.h"
+#include <memory>
 
 class tileobs: public Observer{
         Tile* subject;  
@@ -16,7 +17,7 @@ class tileobs: public Observer{
 };
 
 class Criteria: public Object, public Subject{
-    std::vector <Observer*> observers;
+    std::vector <std::shared_ptr<Observer>> observers;
     Hand COSTS[3] = {Hand{std::vector <Resource> {Resource::CAFF, Resource::TUT, Resource::LEC, Resource::LAB}}, 
     Hand{std::vector <Resource> {Resource::STD, Resource::LEC, Resource::LEC,Resource::STD,Resource::STD}},
     Hand{std::vector <Resource> {Resource::CAFF,Resource::CAFF,Resource::CAFF,Resource::LAB, Resource::LAB,Resource::LEC,Resource::LEC, Resource::TUT, Resource::STD, Resource::STD}}};
@@ -24,7 +25,7 @@ class Criteria: public Object, public Subject{
         int greed = 0;
         Producer last;
     public:
-        std::vector <Observer*> eyes;
+        std::vector <std::shared_ptr<Observer>> eyes;
         std::vector <Criteria*> neighbours;
         std::vector <Goal*> ajacent;
         std::vector <Tile*> tiles;
