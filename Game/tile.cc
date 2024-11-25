@@ -12,10 +12,10 @@ void Dice::notifyObservers() {
     }
 }
 
-void Dice::setValue(int num, PlayerData* p){
+void Dice::setValue(int num, PlayerData* p, controller* cont){
     val = num;
     if (num == 7) {
-        p->goosefy();
+        p->goosefy(cont);
     } else {
         notifyObservers();
     }

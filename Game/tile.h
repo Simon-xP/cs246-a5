@@ -2,6 +2,7 @@
 #define _TILE_H_
 #include "constants.h"
 #include "obs.h"
+#include "../Visuals/screen.h"
 #include <memory>
 
 class PlayerData;
@@ -17,7 +18,7 @@ class Dice: public Subject{
         Hand getStateC() const override { return Hand{}; };
         Producer getStateT() const override { return Producer{}; };
         void notifyObservers();
-        void setValue(int num, PlayerData* p);
+        void setValue(int num, PlayerData* p, controller* cont);
         ~Dice() override;
 };
 

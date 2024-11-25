@@ -4,6 +4,10 @@
 #include "constants.h"
 #include <memory>
 
+struct Producer;
+struct Hand;
+enum class Resource;
+
 class Observer {
  public:
   virtual void notify() = 0;

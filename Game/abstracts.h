@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "obs.h"
 #include <memory>
+#include "../Visuals/screen.h"
 
 
 class Goal;
@@ -15,6 +16,7 @@ class PlayerData;
 class Player;
 class Board;
 class Tile;
+class controller;
 
 class Goose { 
     public:
@@ -46,7 +48,7 @@ struct Board {
  
 };
 void display(Board* b);
-void run_turn (Board* b);
+void run_turn (Board* b, controller* cont);
 
 
 
@@ -59,16 +61,17 @@ class PlayerData{
         Board* b;
         std::vector <std::shared_ptr<Observer>> eyes;
         bool can_steal = false;
+        bool loaded_dice = false;
         void gain(Hand h);
-        void goosefy();
-        void roll(Dice* d);
-        void turn();
+        void goosefy(controller* cont);
+        void roll(Dice* d, controller* cont);
+        void turn(controller* cont);
         void writedata();
         void Discard();
-        void Trade();
+        void Trade(controller* cont);
         ~PlayerData();
-        Tile* selectTargetTile();
-        PlayerData* selectPlayerToStealFrom(const std::vector<PlayerData*>& options);
+        Tile* selectTargetTile(controller* cont);
+        PlayerData* selectPlayerToStealFrom(const std::vector<PlayerData*>& options, controller* cont);
         void executeTrade(PlayerData* selectedPlayer, Hand* hand1, Hand* hand2);
         bool hasResourcesForTrade(const Hand* selectedHand);
         void detach(Goal *o);
@@ -87,6 +90,6 @@ class Object {
 
 std::vector<Resource> getTileOrder(std::mt19937 *gen);
 std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> players[4], std::shared_ptr<std::mt19937> gen);
-void firstTurn(Board* board);
+void firstTurn(Board* board, controller* cont);
 
 #endif

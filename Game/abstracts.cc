@@ -1,6 +1,7 @@
 #include "abstracts.h"
 #include "tile.h"
 #include "constants.h"
+#include "../Visuals/screen.h"
 #include "course.h"
 #include <iostream>
 #include <fstream>
@@ -8,31 +9,8 @@
 #include <algorithm>
 #include <string>
 
-int BOARD_ROWS = 21;
-int BOARD_COLUMNS = 23;
-    std::vector<std::vector<char>> layout = 
-    {{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'C', 'E', 'C', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-    {' ', ' ', ' ', ' ', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', ' ', ' ', ' ', ' '},
-    {' ', ' ', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', ' ', ' '},
-    {' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' '},
-    {' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' '},
-    {'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C'},
-    {' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' '},
-    {' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' '},
-    {' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' '},
-    {'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C'},
-    {' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' '},
-    {' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' '},
-    {' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' '},
-    {'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C'},
-    {' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' '},
-    {' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' '},
-    {' ', ' ', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', ' ', ' '},
-    {' ', ' ', ' ', ' ', ' ', ' ', 'C', 'E', 'C', ' ', ' ', 'T', ' ', ' ', 'C', 'E', 'C', ' ', ' ', ' ', ' ', ' ', ' '},
-    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'E', ' ', ' ', ' ', 'E', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'C', 'E', 'C', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}};
 
+  
 // 4 labs, 4 caffeines, 3 study, 3 tutorial, 4 lecture, 1 netflix
 std::vector<Resource> getTileOrder(std::mt19937 *gen) {
     std::vector<Resource> vec{
@@ -280,19 +258,17 @@ void PlayerData::gain(Hand h){
     }
 }
 
-    Tile* PlayerData::selectTargetTile() {
+Tile* PlayerData::selectTargetTile(controller* cont) {
     int targetIndex = -1;
 
     // Input loop to ensure a valid number between 0 and 18 is selected
     while (true) {
-        std::cout << "Select a target tile (number between 0 and 18): ";
-        std::cin >> targetIndex;
+        *cont << controller::Commands::MOVEG;
+        *cont >> targetIndex;
 
         // Check if input is valid
-        if (std::cin.fail() || targetIndex < 0 || targetIndex > 18) {
-            std::cin.clear(); // Clear error flag
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore invalid input
-            std::cout << "Invalid input. Please enter a number between 0 and 18." << std::endl;
+        if (targetIndex < 0 || targetIndex > 18) {
+            *cont << controller::Commands::INVALIDNUM;
         } else {
             break; // Valid input
         }
@@ -303,35 +279,32 @@ void PlayerData::gain(Hand h){
         return b->tiles.at(targetIndex).get(); // Return the selected tile
     }
 
-    std::cout << "Invalid tile selection. Returning nullptr." << std::endl;
+    *cont << 0;
     return nullptr; // In case of an invalid index (edge case)
 }
 
-PlayerData* PlayerData::selectPlayerToStealFrom(const std::vector<PlayerData*>& options) {
+PlayerData* PlayerData::selectPlayerToStealFrom(const std::vector<PlayerData*>& options, controller* cont) {
     if (options.empty()) {
-        std::cout << "No players available to steal from." << std::endl;
+        *cont << controller::Commands::NOPLAY;
         return nullptr;
     }
 
-    std::cout << "Select a player to steal from:" << std::endl;
+    *cont << controller::Commands::STEAL;
 
     // Display the list of available options
+    Player* pl[3];
     for (size_t i = 0; i < options.size(); ++i) {
-        std::cout << i << ": Player " <<  b->players[std::distance(b->data, 
-        std::find_if(b->data, b->data + 3, [options, i](const std::shared_ptr<PlayerData>& p) {return p.get() == options[i];}))]->Name << std::endl; // Assuming PlayerData has a 'name' property
+        pl[i] = b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [options, i](const std::shared_ptr<PlayerData>& p) {return p.get() == options[i];}))].get();
     }
-
+    cont->chooseplayer(const_cast<const Player**>(pl));
     int selectedIndex = -1;
 
     // Input loop to ensure valid selection
     while (true) {
-        std::cout << "Enter the number corresponding to the player: ";
-        std::cin >> selectedIndex;
+        *cont >> selectedIndex;
 
-        if (std::cin.fail() || selectedIndex < 0 || selectedIndex >= static_cast<int>(options.size())) {
-            std::cin.clear(); // Clear error flag
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore invalid input
-            std::cout << "Invalid input. Please enter a number between 0 and " << options.size() - 1 << "." << std::endl;
+        if (selectedIndex < 0 || selectedIndex >= static_cast<int>(options.size())) {
+            *cont << controller::Commands::INVALIDPLAYER;
         } else {
             break; // Valid input
         }
@@ -341,11 +314,11 @@ PlayerData* PlayerData::selectPlayerToStealFrom(const std::vector<PlayerData*>& 
     return options[selectedIndex];
 }
 
-void PlayerData::goosefy(){
+void PlayerData::goosefy(controller* cont){
     for (std::shared_ptr<PlayerData> p : b->data) {
         p->Discard();
     }
-    Tile* target = selectTargetTile();
+    Tile* target = selectTargetTile(cont);
     if (target) {
         b->goose->move(target);
         std::vector <PlayerData*> options;
@@ -354,7 +327,7 @@ void PlayerData::goosefy(){
                 options.emplace_back(i.get());
             }
         }
-        PlayerData* selected = selectPlayerToStealFrom(options);
+        PlayerData* selected = selectPlayerToStealFrom(options, cont);
         if (selected){
             if (selected->hand->cards.size()){
                 std::shuffle(selected->hand->cards.begin(), selected->hand->cards.end(), *b->gen);
@@ -376,160 +349,189 @@ void PlayerData::Discard(){
 
 };
 
-void PlayerData::roll(Dice* d){
+void PlayerData::roll(Dice* d, controller* cont){
+    if (!loaded_dice) {
     std::uniform_int_distribution<> dist(1, 6);
     int num = dist(*b->gen);
     int num2 = dist(*b->gen);
     for (std::shared_ptr<PlayerData> i : b->data) {
         i->can_steal = false;
     } 
-    d->setValue(num+num2, this);
+    d->setValue(num+num2, this, cont);
+    }
+    else {
+        int val;
+        while (true) {
+        *cont << controller::Commands::PICK;
+        *cont >> val;
+        // Check if input is valid
+        if (val < 0 || val > 12) {
+            *cont << controller::Commands::INVALIDNUM;
+        } else {
+            break; // Valid input
+        }
+    }
+    d->setValue(val, this, cont);
+    }
 }
 
 
-void PlayerData::turn() {
+void PlayerData::turn(controller* cont) {
     bool turnActive = true;
-    int choice;
+    bool rol = false;
 
     // Start the player's turn by rolling the dice
-    roll(b->dice.get());
     Player *play = b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [this](const std::shared_ptr<PlayerData>& p) {return p.get() == this;}))].get();
 
-    std::cout << "\n--- Player " << play->Name << "'s Turn ---" << std::endl;
-    std::cout << "ROLL:" << b->dice->val << std::endl;
-
+    cont->turn(*play, b->turn);
+    *cont << controller::Commands::MENU;
     while (turnActive) {
-        // Display current hand and points
-        std::cout << "\nYour current hand:" << std::endl;
-        std::sort(hand->cards.begin(), hand->cards.end());
-        for (Resource r : hand->cards){
-            std::cout << r << " "; // Cast to int for resource enum display
-        }
-        std::cout << "\nYour current points: " << points << std::endl;
 
-        // Display available actions
-        std::cout << "\nWhat would you like to do?" << std::endl;
-        std::cout << "0. Trade" << std::endl;
-        std::cout << "1. Roll the dice (again, if applicable)" << std::endl;
-        std::cout << "2. Buy a Criteria" << std::endl;
-        std::cout << "3. Buy a Goal" << std::endl;
-        std::cout << "4. View game board" << std::endl;
-        std::cout << "5. End turn" << std::endl;
-        std::cout << "Enter your choice: ";
-        std::cin >> choice;
+        
+        Action act;
+        *cont >> act;
 
-        switch (choice) {
-            case 0: {
-                Trade();
-            }
-            case 1: {
-                std::cout << "Rolling the dice again..." << std::endl;
-                roll(b->dice.get());
-                std::cout << "ROLL:" << b->dice->val << std::endl;
+        switch (act) {
+            case Action::TRADE: {
+                if (rol) {
+                    Trade(cont);
+                } else {
+                    *cont << controller::Commands::MUST;
+                }
                 break;
             }
-            case 2: {
-                std::cout << "Choose a Criteria to buy (enter its index): ";
+            case Action::ROLL: {
+                if (!rol){
+                    roll(b->dice.get(), cont);
+                    rol = true;
+                    *cont << *b->dice.get();
+                } else {
+                    *cont << controller::Commands::ALRROLL;
+                }
+                break;
+            }
+            case Action::CRIT: {
+                if (rol) {
+                *cont << controller::Commands::CHOOSECRIT;
                 int index;
-                std::cin >> index;
+                *cont >> index;
                 if (index >= 0 && index < int(b->criterions.size())) {
                     if (b->criterions[index]->buy(this)) {
-                        std::cout << "Criteria bought successfully!" << std::endl;
+                        // idk, maybe update screen?
                     } else {
-                        std::cout << "Not enough resources or invalid action!" << std::endl;
+                        *cont << controller::Commands::INVALIDCRIT;
                     }
                 } else {
-                    std::cout << "Invalid Criteria index!" << std::endl;
+                    *cont << controller::Commands::INVALIDNUM;
+                }
+            } else {
+                    *cont << controller::Commands::MUST;
                 }
                 break;
             }
-            case 3: {
-                std::cout << "Choose a Goal to buy (enter its index): ";
+            case Action::GOAL: {
+                if (rol) {
+                *cont << controller::Commands::CHOOSEGOAL;
                 int index;
-                std::cin >> index;
+                *cont >> index;
                 if (index >= 0 && index < int(b->goals.size())) {
                     if (b->goals[index]->buy(this)) {
-                        std::cout << "Goal bought successfully!" << std::endl;
+                        // idk, maybe update screen?
                     } else {
-                        std::cout << "Not enough resources or invalid action!" << std::endl;
+                        *cont << controller::Commands::INVALIDGOAL;
                     }
                 } else {
-                    std::cout << "Invalid Goal index!" << std::endl;
+                    *cont << controller::Commands::INVALIDNUM;
+                }
+                } else {
+                    *cont << controller::Commands::MUST;
                 }
                 break;
             }
-            case 4: {
-                std::cout << "\nDisplaying the game board:\n" << std::endl;
-                display(b); // Assume `Board` has a display function
+            case Action::BOARD: {
+                cont->board(*b); 
                 break;
             }
-            case 5: {
-                std::cout << "Ending your turn." << std::endl;
+            case Action::END: {
+                if (rol) {
                 turnActive = false;
+                } else {
+                    *cont << controller::Commands::MUST;
+                }
+                break;
+            }
+            case Action::SWITCH: {
+                loaded_dice = !loaded_dice;
+                break;
+            }
+            case Action::SAVE: {
                 break;
             }
             default:
-                std::cout << "Invalid choice. Please try again." << std::endl;
+                *cont << controller::Commands::MENU;
         }
     }
 }
 
-void firstTurn(Board* b) {
+void firstTurn(Board* b, controller* cont) {
+    cont->board(*b);
     for (int i = 0; i < 4; ++i) {
         PlayerData* player = b->data[i].get();
         Player* play = b->players[i].get();
         
-        std::cout << "\n--- Player " << play->Name << "'s Setup Turn ---" << std::endl;
+        cont->turn(*play, 0);
 
         // Player selects a criteria
         Criteria* chosenCriteria = nullptr;
         while (!chosenCriteria) {
-            std::cout << "Available Criteria:\n";
             for (size_t j = 0; j < b->criterions.size(); ++j) {
                 if ((!b->criterions[j]->owner) && std::all_of(b->criterions[j]->neighbours.begin(), b->criterions[j]->neighbours.end(), [](Criteria* i){return !(i->owner);})){
-                    std::cout << j << ": Criteria at position " << j << std::endl;
+                    //idk maybe graphic?
                 }
             }
 
-            std::cout << "Select a Criteria by entering its index: ";
+            *cont << controller::Commands::CHOOSECRIT;
             int criteriaIndex;
-            std::cin >> criteriaIndex;
+            *cont >> criteriaIndex;
 
             if (criteriaIndex >= 0 && criteriaIndex < int(b->criterions.size()) && !b->criterions[criteriaIndex]->owner && std::all_of(b->criterions[criteriaIndex]->neighbours.begin(), b->criterions[criteriaIndex]->neighbours.end(), [](Criteria* i){return !(i->owner);})) {
                 chosenCriteria = b->criterions[criteriaIndex].get();
             } else {
-                std::cout << "Invalid Criteria selection. Please try again.\n";
+                 *cont << controller::Commands::INVALIDNUM;
             }
         }
 
         // Display adjacent goals for the selected criteria
-        std::cout << "Adjacent Goals:\n";
         std::vector<Goal*> adjacentGoals;
         for (Goal* goal : chosenCriteria->ajacent) {
                 adjacentGoals.push_back(goal);
         }
 
         if (adjacentGoals.empty()) {
-            std::cout << "No adjacent goals available for this Criteria. Please choose a different Criteria.\n";
-            --i; // Retry this player's turn
+            *cont << controller::Commands::INVALIDNUM;
+            --i; 
             continue;
         }
 
-        // Player selects a goal
+
         Goal* chosenGoal = nullptr;
         while (!chosenGoal) {
             for (size_t j = 0; j < adjacentGoals.size(); ++j) {
-                std::cout << j << ": Goal at position " << adjacentGoals[j] << std::endl;
+                // graph
             }
 
-            std::cout << "Select a Goal by entering its index: ";
+            *cont << controller::Commands::CHOOSEGOAL;
             int goalIndex;
-            std::cin >> goalIndex;
+            *cont >> goalIndex;
 
-            if (goalIndex >= 0 && goalIndex < int(adjacentGoals.size())) {
-                chosenGoal = adjacentGoals[goalIndex];
+            if (goalIndex >= 0 && goalIndex < int(b->goals.size())) {
+                if (std::count(adjacentGoals.begin(), adjacentGoals.end(), b->goals.at(goalIndex).get()) > 0) {
+                chosenGoal = b->goals.at(goalIndex).get();
+                } else {
+                    *cont << controller::Commands::INVALIDGOAL;
+                }
             } else {
-                std::cout << "Invalid Goal selection. Please try again.\n";
+                *cont << controller::Commands::INVALIDNUM;
             }
         }
 
@@ -537,52 +539,8 @@ void firstTurn(Board* b) {
         if (chosenCriteria && chosenGoal) {
             chosenCriteria->buy_start(player);
             chosenGoal->buy_start(player);
-            std::cout << "Setup complete! Player " << play->Name << " selected Criteria " 
-                      << chosenCriteria << " and Goal " << chosenGoal << ".\n";
+            //graph
         }
-    }
-}
-
-void display(Board *b){
-    int c = 0;
-    int e = 0;
-    int t = 0;
-     for (int i = 0; i < BOARD_ROWS; ++i) {
-        std::cout << "\n" << std::endl;
-        for (int j = 0; j < BOARD_COLUMNS; ++j) {
-            switch (layout.at(i).at(j))
-            {
-            case 'C':
-                if (b->criterions.at(c)->owner) {
-                    std::cout << b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [b, c](const std::shared_ptr<PlayerData>& p) {return p.get() == b->criterions.at(c)->owner;}))]->colors[std::distance(b->data, std::find_if(b->data, b->data + 3, [b, c](const std::shared_ptr<PlayerData>& p) {return p.get() == b->criterions.at(c)->owner;}))] << b->criterions.at(c)->getgreed();
-                } else {
-                    std::cout << "C" << c << " ";
-                }
-                c++;
-                break;
-            case 'E':
-                if (b->goals.at(e)->owner) {
-                    std::cout << b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [b, e](const std::shared_ptr<PlayerData>& p) {return p.get() == b->goals.at(e)->owner;}))]->colors[std::distance(b->data, std::find_if(b->data, b->data + 3, [b, e](const std::shared_ptr<PlayerData>& p) {return p.get() == b->goals.at(e)->owner;}))] <<" ";
-                } else {
-                    std::cout << "E" << e << " ";
-                }
-                e++;
-                break;
-            case 'T':
-                if (t < 19) {
-                    std::cout << b->tiles.at(t)->res.prod;
-                } else{
-                    std::cout <<"frick";
-                }
-                t++;
-                break;
-            
-            default:
-                std::cout << "   ";
-                break;
-            }
-        }
-
     }
 }
 
@@ -590,26 +548,21 @@ void PlayerData::writedata(){
 
 }
 
-void PlayerData::Trade() {
+void PlayerData::Trade(controller* cont) {
 
     // Prompt the player to create an offer by selecting cards to give and receive
-    std::cout << "Select cards to give:" << std::endl;
-    for (auto& card : hand->cards) {
-        std::cout << card << " ";  // Assuming there's a way to print card information
-    }
-    std::cout << std::endl;
+    *cont << controller::Commands::TRADE1;
+    *cont << *hand;
     // Implement card selection logic (select cards to give)
     ResourceCollection temp1;
-    temp1.inputResources();
+    temp1.inputResources(cont);
     std::unique_ptr<Hand> selectedHand1 = std::make_unique<Hand>(temp1.get_hand());
-    std::cout << "Select cards to receive:" << std::endl;
+    *cont << controller::Commands::TRADE2;
     ResourceCollection temp2;
-    temp2.inputResources();
+    temp2.inputResources(cont);
     std::unique_ptr<Hand> selectedHand2 = std::make_unique<Hand>(temp2.get_hand());
-    for (auto& card : selectedHand2->cards) {
-        std::cout << card << " ";  // Display options for what they want to receive
-    }
-    std::cout << std::endl;
+    *cont << *selectedHand1;
+    *cont << *selectedHand2;
     // Implement card selection logic (select cards to receive)
 
     // Check if the player has enough resources for the trade
@@ -621,13 +574,11 @@ void PlayerData::Trade() {
         int selectedPlayeri = 0;
 
         while (true) {
-        std::cout << "Enter the number corresponding to the player: ";
-        std::cin >> selectedPlayeri;
+        *cont << controller::Commands::TRADE3;
+        *cont >> selectedPlayeri;
 
-        if (std::cin.fail() || selectedPlayeri < 0 || selectedPlayeri >= 4) {
-            std::cin.clear(); // Clear error flag
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore invalid input
-            std::cout << "Invalid input. Please enter a number between 0 and " << 3 << "." << std::endl;
+        if (selectedPlayeri < 0 || selectedPlayeri >= 4) {
+            *cont << controller::Commands::INVALIDNUM;
         } else {
             break; // Valid input
         }
@@ -640,23 +591,21 @@ void PlayerData::Trade() {
                 })) {
 
                 // Ask all other players to accept or decline the trade
-                std::cout << "Trade offer from " << b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [this](const std::shared_ptr<PlayerData>& p) {return p.get() == this;}))]->Name << ": " << selectedHand1->cards << " for " << selectedHand2->cards << std::endl;
+                cont->offer(b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [this](const std::shared_ptr<PlayerData>& p) {return p.get() == this;}))].get(), *selectedHand1, *selectedHand2);
                 for (std::shared_ptr<PlayerData> p : b->data) {
                     if (p.get() != this) {
                         std::string response;
-                        std::cout << b->players[std::distance(b->data, std::find(b->data, b->data + 3, p))]->Name << ", do you accept the trade? (y/n): ";
-                        std::cin >> response;
-
+                        cont->accept(b->players[std::distance(b->data, std::find(b->data, b->data + 3, p))].get());
+                        *cont >> response;
                         if (response == "y" && hasResourcesForTrade(selectedHand2.get())) {
                             // Execute the trade if the player accepts
                             executeTrade(selectedPlayer, selectedHand1.get(), selectedHand2.get());
-                            std::cout << "Trade successful!" << std::endl;
                             return;  // End trade once successful
                         }
                     }
                 }
             } else {
-                std::cout << b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [selectedPlayer](std::shared_ptr<PlayerData> p){return p.get() == selectedPlayer;}))]->Name << " does not have enough resources to complete the trade." << std::endl;
+                 *cont << controller::Commands::INVTRADE;
                 selectedPlayer = nullptr;  // No valid player for the trade
             }
         }
@@ -686,9 +635,9 @@ void PlayerData::executeTrade(PlayerData* selectedPlayer, Hand* hand1, Hand* han
         hadd(hand.get(), card);  // Add card to the current player's hand
     }
 }
-void run_turn (Board* b) {
+void run_turn (Board* b, controller* cont) {
     b->turn++;
-    b->data[b->turn%4]->turn();
+    b->data[b->turn%4]->turn(cont);
 }
 
 PlayerData::~PlayerData(){
