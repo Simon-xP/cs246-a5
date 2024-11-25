@@ -14,15 +14,15 @@ int main() {
     std::shared_ptr<Player> players[4] = {player1, player2, player3, player4};
     int seed = 10;
     std::mt19937 gen(seed);
-    std::shared_ptr<Board> b = generateBoard("main", players, std::shared_ptr<std::mt19937>(&gen));
+    std::shared_ptr<Board> b = generateBoard("main", players, &gen);
     firstTurn(b.get(), &tc);
-    while (std::all_of(b->data, b->data+3, [](std::shared_ptr<PlayerData> x){return x->points < 10;})) {
-        run_turn(b.get(), &tc);
-    }
-    for (auto i : b->data) {
-        if (i->points >= 10) {
-            std::cout << "WINNER: " << b->players[std::distance(b->data, std::find(b->data, b->data + 3, i))]->Name << std::endl;
-        }
-    }
+    // while (std::all_of(b->data, b->data+3, [](std::shared_ptr<PlayerData> x){return x->points < 10;})) {
+    //     run_turn(b.get(), &tc);
+    // }
+    // for (auto i : b->data) {
+    //     if (i->points >= 10) {
+    //         std::cout << "WINNER: " << b->players[std::distance(b->data, std::find(b->data, b->data + 3, i))]->Name << std::endl;
+    //     }
+    // }
     return 0;
 }

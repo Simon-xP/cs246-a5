@@ -42,7 +42,7 @@ struct Board {
     std::vector <std::shared_ptr<Criteria>> criterions;
     std::vector <std::shared_ptr<Tile>> tiles;
     std::shared_ptr<Dice> dice;
-    std::shared_ptr<std::mt19937> gen;
+    std::mt19937* gen;
     std::shared_ptr<Goose> goose;
     ~Board();
  
@@ -89,7 +89,7 @@ class Object {
 
 
 std::vector<Resource> getTileOrder(std::mt19937 *gen);
-std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> players[4], std::shared_ptr<std::mt19937> gen);
+std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen);
 void firstTurn(Board* board, controller* cont);
 
 #endif

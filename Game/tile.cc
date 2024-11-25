@@ -42,13 +42,13 @@ void Tile::notify(){
 }
 
 Tile::~Tile(){
-    observers.clear();
-    if (subject) {
-    subject->detach(this);
-    }
-    subject = nullptr;
+    // observers.clear();
+    // if (subject) {
+    // subject->detach(this);
+    // }
+    // subject = nullptr;
  }
 
  Dice::~Dice(){
-    observers.clear();
+    // observers.clear();
  }

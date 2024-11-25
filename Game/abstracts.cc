@@ -30,11 +30,11 @@ std::vector<int> getTileOrder2(std::mt19937 *gen) {
     return vec;
 }
 
-std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> players[4], std::shared_ptr<std::mt19937> gen) {
+std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen) {
     std::shared_ptr<Dice> d = std::make_shared<Dice>();
     std::shared_ptr<Goose> g = std::make_shared<Goose>();
-    auto tileorder = getTileOrder(gen.get());
-    auto tileorder2 = getTileOrder2(gen.get());
+    auto tileorder = getTileOrder(gen);
+    auto tileorder2 = getTileOrder2(gen);
     int t = 0;
     int t2 = 0;
 
@@ -641,56 +641,21 @@ void run_turn (Board* b, controller* cont) {
 }
 
 PlayerData::~PlayerData(){
-    corners.clear();
-    edges.clear();
-    eyes.clear();
-    hand.reset();
+    // corners.clear();
+    // edges.clear();
+    // eyes.clear();
+    // hand.reset();
 
 }
 
 Board::~Board() {
 
-    // Reset all smart pointers and clear containers explicitly (optional)
-    for (auto& player : players) {
-        if (player){
-        player.reset(); // Reset shared_ptr to release the ownership
-        }
-    }
-
-    for (auto& datum : data) {
-        if (datum) {
-        datum.reset();
-        }
-    }
-   for (auto& datum : goals) {
-                if (datum) {
-        datum.reset();
-        }
-    }
-   for (auto& datum : criterions) {
-               if (datum) {
-        for (auto& datun : datum->eyes){
-            if (datun) {
-                datun.reset();
-            }
-        }
-        datum.reset();
-        }
-    }
-   for (auto& datum : tiles) {
-                if (datum) {
-        datum.reset();
-        }
-    }
-
-    goals.clear();       // Clear the vector of shared_ptr, releasing objects
-    criterions.clear();  // Clear the vector of shared_ptr, releasing objects
-    tiles.clear();       // Clear the vector of shared_ptr, releasing objects
-
 }
 
+
+
 Goose::~Goose(){
-    tile = nullptr;
+    // tile = nullptr;
 }
 
 void PlayerData::detach(Observer* o){

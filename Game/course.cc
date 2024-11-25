@@ -128,42 +128,41 @@ void Criteria::detach(tileobs* o){
 }
 
 Goal::~Goal(){
-    ajacent1.clear();
-    ajacent2.clear();
-        if (owner){
-    owner->detach(this);
-    }
-    owner = nullptr;
+    // ajacent1.clear();
+    // ajacent2.clear();
+    //     if (owner){
+    // owner->detach(this);
+    // }
+    // owner = nullptr;
 }
 
 Criteria::~Criteria(){
-    observers.clear();
-    eyes.clear();
-    ajacent.clear();
-    neighbours.clear();
-    tiles.clear();
-        if (owner){
-    owner->detach(this);
-    }
-    owner = nullptr;
+    // observers.clear();
+    // ajacent.clear();
+    // neighbours.clear();
+    // tiles.clear();
+    // if (owner){
+    // owner->detach(this);
+    // }
+    // owner = nullptr;
 }
 courseobs::~courseobs(){
-    if (subject){
-    subject->detach(this);
-    }
-    if (owner){
-    owner->detach(this);
-    }
-    subject = nullptr;
-    owner = nullptr;
+    // if (subject){
+    // subject->detach(this);
+    // }
+    // if (owner){
+    // owner->detach(this);
+    // }
+    // subject = nullptr;
+    // owner = nullptr;
 }
 tileobs::~tileobs(){
-    if (subject){
-    subject->detach(this);
-    }
-    if (owner){
-    owner->detach(this);
-    }
-    subject = nullptr;
-    owner = nullptr;
+    // if (subject){
+    // subject->detach(this);
+    // }
+    // if (owner){
+    // owner->detach(this);
+    // }
+    // subject = nullptr;
+    // owner = nullptr;
 }
