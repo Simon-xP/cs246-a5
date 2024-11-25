@@ -13,6 +13,7 @@ struct Hand;
 class Board;
 enum class Resource;
 class Dice;
+class PlayerData;
 
 enum Action {TRADE, ROLL, CRIT, GOAL, BOARD, SWITCH, END, SAVE, EXIT};
 
@@ -22,8 +23,8 @@ class controller {
         Controltypes controltype;
     public:
         enum Commands {MENU, RESET, MOVEG, TRADE1, TRADE2, STEAL, FIRSTGOAL, FIRSTCRIT, CHOOSECRIT, CHOOSEGOAL,
-        INVALIDGOAL, INVALIDCRIT, INVALIDPLAYER, ROLL, END, AFDGOAL, AFDCRIT, INVALIDNUM, NOPLAY, ALRROLL, TRADE3, INVTRADE,
-        RES, MUST, PICK};
+        INVALIDGOAL, INVALIDCRIT, INVALIDPLAYER, ROLL, SAVEBOARD, END, AFDGOAL, AFDCRIT, INVALIDNUM, NOPLAY, ALRROLL, TRADE3, INVTRADE,
+        RES, MUST, PICK, SFILENAME};
         virtual void chooseplayer(const Player* p[3]) = 0;
         virtual void offer(const Player* p, Hand& h1, Hand& h2) = 0;
         virtual void accept(const Player* p) = 0;
@@ -38,9 +39,11 @@ class controller {
         virtual controller& operator<<(const Commands c) = 0;
         virtual controller& operator<<(const Hand& c) = 0;
         virtual controller& operator<<(const Dice& c) = 0;
+        virtual controller& operator<<(const PlayerData& player) = 0;
         virtual controller& operator>>(Action& c) = 0;
         virtual controller& operator>>(int& c) = 0;
         virtual controller& operator>>(std::string& c) = 0;
+        
 };
 
 class gcontroller: public controller{
@@ -61,6 +64,7 @@ class gcontroller: public controller{
         controller& operator<<(const Commands c)override;
         controller& operator<<(const Hand& c)override;
         controller& operator<<(const Dice& c)override;
+        controller& operator<<(const PlayerData& player) override;
         controller& operator>>(Action& c) override;
         controller& operator>>(int& c) override;
         controller& operator>>(std::string& c) override;
@@ -82,6 +86,7 @@ class tcontroller: public controller{
         controller& operator<<(const Commands c) override;
         controller& operator<<(const Hand& c)override;
         controller& operator<<(const Dice& c)override;
+        controller& operator<<(const PlayerData& player) override;
         controller& operator>>(Action& c)override;
         controller& operator>>(int& c) override;
         controller& operator>>(std::string& c) override;

@@ -22,7 +22,7 @@ void tcontroller::board(const Board& b){
  int c = 0;
     int e = 0;
     int t = 0;
-     for (int i = 0; i < BOARD_ROWS; ++i) {
+    for (int i = 0; i < BOARD_ROWS; ++i) {
         std::cout << "\n" << std::endl;
         for (int j = 0; j < BOARD_COLUMNS; ++j) {
             switch (layout.at(i).at(j))
@@ -57,13 +57,35 @@ void tcontroller::board(const Board& b){
                 break;
             }
         }
-
     }
+    std::cout << std::endl;
 }
 
 void tcontroller::turn(const Player& p, const int& i){
     std::cout << "\n--- TURN " << i << " ---" << std::endl;
     std::cout << "\n--- Player " << p.Name << "'s Turn ---" << std::endl;
+}
+
+controller& tcontroller::operator<<(const PlayerData& player) {
+    std::cout << player.getAmountResource(Resource::CAFF)
+       << player.getAmountResource(Resource::LAB)
+       << player.getAmountResource(Resource::LEC)
+       << player.getAmountResource(Resource::STD)
+       << player.getAmountResource(Resource::TUT);
+    std::cout << "g";
+    for (const auto& edge : player.edges) {
+        if (edge) {
+            std::cout << edge->index;
+        }
+    }
+    std::cout << "c";
+    for (const auto& corner : player.corners) {
+        if (corner) {
+            std::cout << corner->index << corner->getgreed();
+        }
+    }
+    std::cout << std::endl;
+    return *this;
 }
 
 void tcontroller::winner(const Player& p, const int& i){
@@ -176,6 +198,14 @@ controller& tcontroller::operator<<(const Commands c) {
         case ROLL:
             std::cout << "Rolling the dice again..." << std::endl;
             break;
+        
+        case SAVEBOARD:
+            std::cout << "Saving to file..." << std::endl;
+            break;
+
+        case SFILENAME:
+            std::cout << "Enter the filename: " << std::endl;
+            break;
 
         case END:
             std::cout << "Ending your turn." << std::endl;
@@ -274,7 +304,7 @@ controller& tcontroller::operator>>(int& c){
 }
 
 controller& tcontroller::operator>>(std::string& c){
-    int temp;
+    std::string temp;
     while (true){
         if (std::cin >> temp) {
             c = temp;
