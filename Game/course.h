@@ -27,6 +27,7 @@ class Criteria: public Object, public Subject{
         int greed = 0;
         Producer last;
     public:
+        int index;
         ~Criteria() override;
         std::vector <std::shared_ptr<Observer>> eyes;
         std::vector <Criteria*> neighbours;
@@ -56,6 +57,7 @@ class courseobs: public Observer{
 
 class Goal: public Object{
     public:
+        int index;
         Hand cost = {std::vector <Resource> {Resource::STD, Resource::TUT}};
         std::vector <Goal*> ajacent1;
         std::vector <Criteria*> ajacent2;

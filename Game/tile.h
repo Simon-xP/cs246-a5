@@ -24,10 +24,9 @@ class Dice: public Subject{
 
 class Tile: public Observer, public Subject{
     std::vector <Observer*> observers;
-    enum tiles{NETFLIX, STUDY, LECTURE, TUTORIAL, LAB, CAFFEINE} ;
-    protected:
-        int pos;
+    enum tiles{NETFLIX, STUDY, LECTURE, TUTORIAL, LAB, CAFFEINE};
     public:
+        int pos;
         int dieVal = -1;
         bool goosed = false;
         Producer res;

@@ -44,6 +44,7 @@ struct Board {
     std::shared_ptr<Dice> dice;
     std::mt19937* gen;
     std::shared_ptr<Goose> goose;
+    void saveBoard(std::string filename, controller* cont);
     ~Board();
  
 };
@@ -74,9 +75,11 @@ class PlayerData{
         PlayerData* selectPlayerToStealFrom(const std::vector<PlayerData*>& options, controller* cont);
         void executeTrade(PlayerData* selectedPlayer, Hand* hand1, Hand* hand2);
         bool hasResourcesForTrade(const Hand* selectedHand);
+        int getAmountResource(Resource r) const;
         void detach(Goal *o);
         void detach(Criteria *o);
         void detach(Observer *o);
+        friend std::ostream& operator<<(std::ostream& os, const PlayerData& player);
 };
 
 class Object {

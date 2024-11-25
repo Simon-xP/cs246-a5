@@ -37,6 +37,9 @@ std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> p
     auto tileorder2 = getTileOrder2(gen);
     int t = 0;
     int t2 = 0;
+    int goalCount = 0;
+    int criteriaCount = 0;
+    int tileCount = 0;
 
     // goals are edges, criterion are corners, tiles are T
 
@@ -60,6 +63,8 @@ std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> p
             case 'C':
             {
                 std::shared_ptr<Criteria> w = std::make_shared<Criteria>();
+                w->index = criteriaCount;
+                criteriaCount++;
                 temp1.emplace_back(nullptr);
                 temp4.emplace_back(nullptr);
                 temp3.emplace_back(w.get());
@@ -69,6 +74,8 @@ std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> p
             case 'E':
             {
                 std::shared_ptr<Goal> s = std::make_shared<Goal>();
+                s->index = goalCount;
+                goalCount++;
                 temp1.emplace_back(nullptr);
                 temp3.emplace_back(nullptr);
                 temp4.emplace_back(s.get());
@@ -78,6 +85,8 @@ std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> p
             case 'T':
             {
                 std::shared_ptr<Tile> q = std::make_shared<Tile>(d.get());
+                q->pos = tileCount;
+                tileCount++;
                 temp1.emplace_back(q.get());
                 c.emplace_back(q);
                 temp3.emplace_back(nullptr);
@@ -237,6 +246,62 @@ std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> p
     return bor;
 }
 
+std::ostream& operator<<(std::ostream &os, const PlayerData& player) {
+    os << player.getAmountResource(Resource::CAFF) << " "
+       << player.getAmountResource(Resource::LAB) << " "
+       << player.getAmountResource(Resource::LEC) << " "
+       << player.getAmountResource(Resource::STD) << " "
+       << player.getAmountResource(Resource::TUT) << " ";
+    os << "g" << " ";
+    for (const auto& edge : player.edges) {
+        if (edge) {
+            os << " " << edge->index;
+        }
+    }
+    os << "c" << " ";
+    for (const auto& corner : player.corners) {
+        if (corner) {
+            os << " " << corner->index << " " << corner->getgreed();
+        }
+    }
+    os << std::endl;
+    return os;
+}
+
+void Board::saveBoard(std::string filename, controller* cont) {
+    *cont << controller::Commands::SAVEBOARD;
+    std::ofstream file{filename};
+
+    file << turn << std::endl;
+    for (const auto& playerD : data) {
+        file << *playerD;
+    }
+    for (const auto& tile : tiles) {
+        if (tile->dieVal == -1) {
+            file << static_cast<int>(tile->res.prod) << " " << 7 << " ";
+        } else {
+            file << static_cast<int>(tile->res.prod) << " " << tile->dieVal << " ";
+        }
+    }
+    file << std::endl;
+    if (goose->tile) {
+        file << goose->tile->pos << std::endl;
+    } else {
+        file << "-1" << std::endl;
+    }
+}
+
+int PlayerData::getAmountResource(Resource r) const {
+    int count = 0;
+    for (const auto& card : hand->cards) {
+        if (card == r) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+
 void Goose::move(Tile* target){
     if (tile) {
         tile->goosed = false;
@@ -379,6 +444,7 @@ void PlayerData::roll(Dice* d, controller* cont){
 void PlayerData::turn(controller* cont) {
     bool turnActive = true;
     bool rol = false;
+    std::string saveFile;
 
     // Start the player's turn by rolling the dice
     Player *play = b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [this](const std::shared_ptr<PlayerData>& p) {return p.get() == this;}))].get();
@@ -452,6 +518,16 @@ void PlayerData::turn(controller* cont) {
                 cont->board(*b); 
                 break;
             }
+            case Action::SAVE: {
+                if (!rol){
+                    *cont << controller::Commands::SFILENAME; // "enter filename:"
+                    *cont >> saveFile;
+                    b->saveBoard(saveFile, cont);
+                } else {
+                    *cont << controller::Commands::ALRROLL;
+                }
+                break;
+            }
             case Action::END: {
                 if (rol) {
                 turnActive = false;
@@ -462,9 +538,6 @@ void PlayerData::turn(controller* cont) {
             }
             case Action::SWITCH: {
                 loaded_dice = !loaded_dice;
-                break;
-            }
-            case Action::SAVE: {
                 break;
             }
             default:
@@ -549,7 +622,6 @@ void PlayerData::writedata(){
 }
 
 void PlayerData::Trade(controller* cont) {
-
     // Prompt the player to create an offer by selecting cards to give and receive
     *cont << controller::Commands::TRADE1;
     *cont << *hand;
@@ -651,8 +723,6 @@ PlayerData::~PlayerData(){
 Board::~Board() {
 
 }
-
-
 
 Goose::~Goose(){
     // tile = nullptr;
