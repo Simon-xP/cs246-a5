@@ -16,13 +16,13 @@ int main() {
     std::mt19937 gen(seed);
     std::shared_ptr<Board> b = generateBoard("main", players, &gen);
     firstTurn(b.get(), &tc);
-    // while (std::all_of(b->data, b->data+3, [](std::shared_ptr<PlayerData> x){return x->points < 10;})) {
-    //     run_turn(b.get(), &tc);
-    // }
-    // for (auto i : b->data) {
-    //     if (i->points >= 10) {
-    //         std::cout << "WINNER: " << b->players[std::distance(b->data, std::find(b->data, b->data + 3, i))]->Name << std::endl;
-    //     }
-    // }
+    while (std::all_of(b->data, b->data+3, [](std::shared_ptr<PlayerData> x){return x->points < 10;})) {
+        run_turn(b.get(), &tc);
+    }
+    for (auto i : b->data) {
+        if (i->points >= 10) {
+            std::cout << "WINNER: " << b->players[std::distance(b->data, std::find(b->data, b->data + 3, i))]->Name << std::endl;
+        }
+    }
     return 0;
 }
