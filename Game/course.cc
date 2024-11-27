@@ -69,6 +69,18 @@ bool Criteria::buy_start(PlayerData* p) {
     return false;
 }
 
+bool Criteria::force_buy(PlayerData* p) {
+    if (!owner){
+        owner = p;
+        p->eyes.emplace_back(std::make_shared<courseobs>(this,p));
+        greed++;
+        cost = COSTS[greed];
+        p->points++;
+        return true;
+    }
+    return false;
+}
+
 
 courseobs::courseobs(Criteria* subject, PlayerData* p): subject{subject}, owner{p}{
     subject->attach(this);

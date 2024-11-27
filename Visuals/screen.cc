@@ -19,11 +19,14 @@ void accept(const Player* p){
  }
 
 void tcontroller::board(const Board& b){
- int c = 0;
+    std::string resour[6] = {"Caffeine", "Lab", "Lecture", "Study", "Tutorial", "Netflix"};
+    int c = 0;
     int e = 0;
     int t = 0;
+    int t2 = 0;
+    bool long_space = false; 
     for (int i = 0; i < BOARD_ROWS; ++i) {
-        std::cout << "\n" << std::endl;
+        std::cout << "\n";
         for (int j = 0; j < BOARD_COLUMNS; ++j) {
             switch (layout.at(i).at(j))
             {
@@ -31,7 +34,21 @@ void tcontroller::board(const Board& b){
                 if (b.criterions.at(c)->owner) {
                     std::cout << b.players[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, c](const std::shared_ptr<PlayerData>& p) {return p.get() == b.criterions.at(c)->owner;}))]->colors[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, c](const std::shared_ptr<PlayerData>& p) {return p.get() == b.criterions.at(c)->owner;}))] << b.criterions.at(c)->getgreed();
                 } else {
-                    std::cout << "C" << c << " ";
+                    if (c >= 10) {
+                    std::cout << "|" << c << "|";
+                    }
+                    else {
+                        std::cout << "| " << c << "|";
+                    }
+					if (j + 1 < BOARD_COLUMNS && layout.at(i).at(j+1) != ' ') {
+						std::cout << " --";
+					}else {
+                        if (c < 10) {
+                        std::cout << "          ";
+                        } else {
+                            std::cout << "         ";
+                        }
+                    }
                 }
                 c++;
                 break;
@@ -39,24 +56,198 @@ void tcontroller::board(const Board& b){
                 if (b.goals.at(e)->owner) {
                     std::cout << b.players[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, e](const std::shared_ptr<PlayerData>& p) {return p.get() == b.goals.at(e)->owner;}))]->colors[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, e](const std::shared_ptr<PlayerData>& p) {return p.get() == b.goals.at(e)->owner;}))] <<" ";
                 } else {
-                    std::cout << "E" << e << " ";
+                    std::cout << e;
+					if (j + 1 < BOARD_COLUMNS && layout.at(i).at(j+1) != ' ') {
+						std::cout << "-- ";
+					} else {
+                        if (e < 10){
+                            std::cout << "                ";
+                        } else {
+                            std::cout << "               ";
+                        }
+                    }
                 }
                 e++;
                 break;
             case 'T':
                 if (t < 19) {
-                    std::cout << b.tiles.at(t)->res.prod;
+                    if (b.tiles.at(t)->dieVal == -1) {
+                        std::cout << 7 << "       ";
+                    }
+                    else if (b.tiles.at(t)->dieVal < 10) {
+                        std::cout << b.tiles.at(t)->dieVal << "        ";
+                    } else {
+                        std::cout << b.tiles.at(t)->dieVal << "       ";
+                    }
                 } else{
                     std::cout <<"frick";
                 }
                 t++;
                 break;
-            
-            default:
+
+            case '1':
+                std::cout << "                                       ";
+                break;
+
+            case '2':
+                std::cout << "                                      ";
+                break;
+
+            case '3':
+                std::cout << "                       ";
+                break;
+            case '4':
+                std::cout << "                    ";
+                break;
+
+            case '5':
+                std::cout << "     ";
+                break;
+
+            case '6':
                 std::cout << "   ";
+                break;
+
+            default:
+                std::cout << "";
                 break;
             }
         }
+
+        bool in = (i < 4 || (i < 16 && (i % 4 == 1 || i % 4 == 0)));    
+        if ((i % 4 == 0 || i % 4 == 2) && (i < 16 && i > 4)) {
+            long_space = !long_space;
+        }
+        
+
+        if (i == BOARD_ROWS - 1) {
+            continue;
+        }
+        std::cout << std::endl;
+        std::cout << "   ";
+        for (int j = 0; j < BOARD_COLUMNS; ++j) {
+            // Determine the row to use based on the condition
+            const auto& current_row = (2 * i < BOARD_ROWS) ? layout.at(i) : layout.at(i + 1);
+            std::string prod_output = "";
+
+            // Determine if there is a product to output
+            if ((j+2 < BOARD_COLUMNS && layout.at(i + 1).at(j+2) == 'T') || (j+3 < BOARD_COLUMNS && layout.at(i + 1).at(j+3) == 'T')) {
+                if (t2 < 19){
+                prod_output = resour[static_cast<int>(b.tiles.at(t2)->res.prod)]; //b.tiles.at(t2)->res.prod; // Get the product
+                }
+            }
+
+            // Render based on layout
+            switch (current_row.at(j)) {
+            case 'C': {
+                // Logic is flipped for layout.at(i + 1)
+                if ((2 * i < BOARD_ROWS && i % 2 == 0) || (2 * i >= BOARD_ROWS && i % 2)) {
+                    std::cout << (in ? "/" : "\\"); // Output slash
+
+                    // Calculate the remaining space dynamically
+      
+                    int base_space = long_space ? 18 : 14;
+                    int adjusted_space; // Ensure no negative spaces
+                    if ((i > 0) && (i % 2 == 1) && (i < 19)){
+                        adjusted_space = base_space - static_cast<int>(prod_output.size());
+                        adjusted_space = std::max(0, adjusted_space); // Ensure no negative spaces
+                        std::cout << std::string((adjusted_space)/2, ' ');
+                        std::cout << prod_output;
+                        if (prod_output != "") {
+                            ++t2;
+                        }
+                        std::cout << std::string((adjusted_space+1)/2, ' ');
+                        prod_output = "";
+
+                        
+                    } else {
+                         adjusted_space = base_space;
+                         std::cout << std::string(adjusted_space, ' ');
+                    }
+
+
+                    // Output product if exists
+
+                    // Output remaining spaces
+                    
+
+                    in = !in;          // Toggle slash direction
+                    long_space = !long_space; // Toggle space length
+                }
+                break;
+            }
+
+            case 'E': {
+                // Logic is flipped for layout.at(i + 1)
+                if ((i * 2< BOARD_ROWS && i % 2) || (2 * i >= BOARD_ROWS && i % 2 == 0)) {
+                    std::cout << (in ? "/" : "\\"); // Output slash
+
+                    // Calculate the remaining space dynamically
+                    int base_space = long_space ? 18 : 14;
+                    int adjusted_space; // Ensure no negative spaces
+                    if (i > 0 && (i % 2 == 1) && i < 19){
+                        adjusted_space = base_space - static_cast<int>(prod_output.size());
+                        adjusted_space = std::max(0, adjusted_space); // Ensure no negative spaces
+                        std::cout << std::string((adjusted_space)/2, ' ');
+                        std::cout << prod_output;
+                        std::cout << std::string((adjusted_space+1)/2, ' ');
+                        if (prod_output != "") {
+                            ++t2;
+                        }
+                        prod_output = "";
+                        
+
+                        
+                    } else {
+                         adjusted_space = base_space;
+                         std::cout << std::string(adjusted_space, ' ');
+                    }
+                    // Output product if exists
+
+
+                    in = !in;          // Toggle slash direction
+                    long_space = !long_space; // Toggle space length
+                }
+                break;
+            }
+
+            case 'T':
+                // Handle 'T' case if needed
+                break;
+
+
+            case '1':
+                std::cout << "                                    ";
+                break;
+
+            case '2':
+                std::cout << "                                  ";
+                break;
+
+            case '3':
+                std::cout << "                   ";
+                break;
+            case '4':
+                std::cout << "                 ";
+                break;
+
+            case '5':
+                std::cout << "  ";
+                break;
+
+            case '6':
+                if (i == 7 || i == 12) {
+                std::cout << "  ";
+                }
+                std::cout << "";
+                break;            
+
+            default:
+                std::cout << "";
+                break;
+            }
+        }
+    long_space = !long_space; 
     }
     std::cout << std::endl;
 }

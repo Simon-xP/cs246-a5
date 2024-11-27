@@ -20,13 +20,13 @@ class tileobs: public Observer{
 
 class Criteria: public Object, public Subject{
     std::vector <Observer*> observers;
-    Hand COSTS[3] = {Hand{std::vector <Resource> {Resource::CAFF, Resource::TUT, Resource::LEC, Resource::LAB}}, 
-    Hand{std::vector <Resource> {Resource::STD, Resource::LEC, Resource::LEC,Resource::STD,Resource::STD}},
-    Hand{std::vector <Resource> {Resource::CAFF,Resource::CAFF,Resource::CAFF,Resource::LAB, Resource::LAB,Resource::LEC,Resource::LEC, Resource::TUT, Resource::STD, Resource::STD}}};
     protected:
         int greed = 0;
         Producer last;
     public:
+        Hand COSTS[3] = {Hand{std::vector <Resource> {Resource::CAFF, Resource::TUT, Resource::LEC, Resource::LAB}}, 
+        Hand{std::vector <Resource> {Resource::STD, Resource::LEC, Resource::LEC,Resource::STD,Resource::STD}},
+        Hand{std::vector <Resource> {Resource::CAFF,Resource::CAFF,Resource::CAFF,Resource::LAB, Resource::LAB,Resource::LEC,Resource::LEC, Resource::TUT, Resource::STD, Resource::STD}}};
         int index;
         ~Criteria() override;
         std::vector <std::shared_ptr<Observer>> eyes;
@@ -43,7 +43,9 @@ class Criteria: public Object, public Subject{
         Producer getStateT() const override { return Producer{}; };
         bool buy(PlayerData* p) override;
         bool buy_start(PlayerData* p);
+        bool force_buy(PlayerData* p);
         int getgreed(){return greed;}
+        void setgreed(int a){greed = a;}
 };
 
 class courseobs: public Observer{

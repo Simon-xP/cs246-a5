@@ -7,6 +7,7 @@
 #include <fstream>
 #include <random>
 #include <algorithm>
+#include <sstream>
 #include <string>
 
 
@@ -25,16 +26,16 @@ std::vector<Resource> getTileOrder(std::mt19937 *gen) {
 }
 
 std::vector<int> getTileOrder2(std::mt19937 *gen) {
-    std::vector<int> vec{3, 10, 5, 4, 10, 11, 3, 8, 2, 6, 8, 12, 5, 11, 4, 6, 9, 9};
+    std::vector<int> vec{2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12};
     std::shuffle(vec.begin(), vec.end(), *gen);
     return vec;
 }
 
-std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen) {
+std::shared_ptr<Board> makeBoard(std::string name, std::shared_ptr<Player> players[4], std::mt19937 *gen,
+                    std::vector<Resource> tileorder, std::vector<int> tileorder2) {
     std::shared_ptr<Dice> d = std::make_shared<Dice>();
     std::shared_ptr<Goose> g = std::make_shared<Goose>();
-    auto tileorder = getTileOrder(gen);
-    auto tileorder2 = getTileOrder2(gen);
+
     int t = 0;
     int t2 = 0;
     int goalCount = 0;
@@ -230,6 +231,8 @@ std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> p
                 if (tileorder.at(t) != Resource::UM) {
                     temp0.at(i).at(j)->dieVal = tileorder2.at(t2);
                     t2++;
+                } else if (tileorder2.at(t2) == 7) {
+                    t2++;
                 }
                 t++;
                 break;
@@ -244,6 +247,109 @@ std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> p
         i->b = bor.get();
     }
     return bor;
+}
+
+std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen) {
+    auto tileorder = getTileOrder(gen);
+    auto tileorder2 = getTileOrder2(gen);
+    return makeBoard(name, players, gen, tileorder, tileorder2);
+}
+
+std::shared_ptr<Board> loadBoard(std::string info, std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen) {
+    std::istringstream iss{info};
+    std::vector<Resource> tileorder;
+    std::vector<int> tileorder2;
+    int cur;
+
+    int i = 0;
+    while (iss >> cur) {
+        if (i % 2) {
+            tileorder2.emplace_back(cur);
+        } else {
+            tileorder.emplace_back(static_cast<Resource>(cur));
+        }
+        ++i;
+    }
+    return makeBoard(name, players, gen, tileorder, tileorder2);
+}
+
+std::shared_ptr<Board> openFile(std::string filename, std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen) {
+    std::ifstream file(filename);
+    std::ostringstream ss;
+    ss << file.rdbuf();
+    return loadGameState(ss.str(), name, players, gen);
+}
+
+std::shared_ptr<Board> loadGameState(std::string info, std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen) {
+    std::istringstream iss{info};
+    std::string s;
+    int turn;
+    int goose;
+    int numCaf, numLab, numLec, numStd, numTut;
+    std::vector<std::string> playerLines(4);
+    std::string boardLine;
+    char oof;
+
+    iss >> turn;
+    iss.ignore();
+    
+    // get string sequences for each player
+    for (int i = 0; i < 4; ++i) {
+        std::getline(iss, playerLines.at(i));
+    }
+
+    // initialize board with board data
+    std::getline(iss, boardLine);
+    std::shared_ptr<Board> b = loadBoard(info, name, players, gen);
+    b->turn = turn;
+    std::cout << "populated turn" << std::endl;
+
+    // for each player, read in 5 ints, then g, then as many ints until c, then as many pairs as possible
+    for (int i = 0; i < 4; ++i) {
+        std::istringstream playerStream{playerLines[i]};
+        playerStream >> numCaf >> numLab >> numLec >> numStd >> numTut;
+        std::cout << "iteration #" << i << std::endl;
+
+        for (int i = 0; i < numCaf; ++i) {
+            b->data[i]->hand->cards.emplace_back(Resource::CAFF);
+        }
+        for (int j = 0; j < numLab; ++j) {
+            b->data[i]->hand->cards.emplace_back(Resource::LAB);
+        }
+        for (int j = 0; j < numLec; ++j) {
+            b->data[i]->hand->cards.emplace_back(Resource::LEC);
+        }
+        for (int j = 0; j < numStd; ++j) {
+            b->data[i]->hand->cards.emplace_back(Resource::STD);
+        }
+        for (int j = 0; j < numTut; ++j) {
+            b->data[i]->hand->cards.emplace_back(Resource::TUT);
+        }
+
+        playerStream >> oof; // reads 'g'
+
+        int n;
+        int m;
+        std::cout << "looping through goals and criterions" << std::endl;
+        while (playerStream >> n) {
+            b->goals.at(n)->buy_start(b->data[n].get());
+            char nextChar = playerStream.peek();
+            if (nextChar == 'c') {
+                playerStream.get(); // reads 'c'
+                break;
+            }
+            while (playerStream >> n >> m) {
+                b->criterions.at(n)->force_buy(b->data[n].get());
+                b->criterions.at(n)->setgreed(m);
+                b->criterions.at(n)->cost = b->criterions.at(n)->COSTS[m];
+            }
+        }
+    }
+    iss >> goose;
+    if (goose >= 0) {
+        b->goose->move(b->tiles.at(goose).get());
+    }
+    return b;
 }
 
 std::ostream& operator<<(std::ostream &os, const PlayerData& player) {

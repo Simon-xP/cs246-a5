@@ -50,8 +50,10 @@ struct Board {
 };
 void display(Board* b);
 void run_turn (Board* b, controller* cont);
-
-
+std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen);
+std::shared_ptr<Board> loadBoard(std::string info, std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen);
+std::shared_ptr<Board> openFile(std::string filename, std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen);
+std::shared_ptr<Board> loadGameState(std::string info, std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen);
 
 class PlayerData{
     public:
