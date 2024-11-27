@@ -36,7 +36,7 @@ bool Criteria::buy(PlayerData* p) {
     if ((!owner || owner == p) && (greed < 3)){
         if  ((std::any_of(p->edges.begin(), p->edges.end(), [this](Goal* i){return std::find_if(ajacent.begin(), ajacent.end(), [i](Goal* x){return i == x;}) != ajacent.end();}))){
             if (std::all_of(neighbours.begin(), neighbours.end(), [](Criteria* i){return !(i->owner);})){
-                if (std::all_of(p->hand->cards.begin(), p->hand->cards.end(), [p, this](Resource i){return herr(p->hand.get(), i)<herr(&cost, i);})) {
+                if (std::all_of(cost.cards.begin(), cost.cards.end(), [p, this](Resource i){return herr(p->hand.get(), i)>=herr(&cost, i);})) {
                     for (auto i : cost.cards) {
                         hsub(p->hand.get(), i);
                     }
@@ -96,7 +96,7 @@ bool Goal::buy(PlayerData* p){
     if (!owner) {
         if  (std::any_of(p->corners.begin(), p->corners.end(), [this, p](Criteria* i){return std::find_if(ajacent2.begin(), ajacent2.end(), [i](Criteria* x){return i == x;}) != ajacent2.end();}) || 
         std::any_of(p->edges.begin(), p->edges.end(), [this](Goal* j){return std::find_if(ajacent1.begin(), ajacent1.end(), [j](Goal* x){return j == x;}) != ajacent1.end();})){
-            if (std::all_of(p->hand->cards.begin(), p->hand->cards.end(), [p, this](Resource i){return herr(p->hand.get(), i)<herr(&cost, i);})) {
+            if (std::all_of(cost.cards.begin(), cost.cards.end(), [p, this](Resource i){return herr(p->hand.get(), i)>=herr(&cost, i);})) {
                 for (auto i : cost.cards) {
                     hsub(p->hand.get(), i);
                 }

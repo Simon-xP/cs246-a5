@@ -274,9 +274,12 @@ std::shared_ptr<Board> loadBoard(std::string info, std::string name, std::shared
 }
 
 std::shared_ptr<Board> openFile(std::string filename, std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen) {
-    std::ifstream file(filename);
-    std::ostringstream ss;
-    ss << file.rdbuf();
+   std::ifstream file(filename);
+    if (!file.is_open()) {        
+        throw std::runtime_error("Could not open file: " + filename);
+    }
+    std::ostringstream ss;       
+    ss << file.rdbuf();           
     return loadGameState(ss.str(), name, players, gen);
 }
 
@@ -285,70 +288,84 @@ std::shared_ptr<Board> loadGameState(std::string info, std::string name, std::sh
     std::string s;
     int turn;
     int goose;
-    int numCaf, numLab, numLec, numStd, numTut;
-    std::vector<std::string> playerLines(4);
+    int numCaf = 0, numLab = 0, numLec = 0, numStd = 0, numTut = 0;
+    std::vector<std::string> playerLines;
     std::string boardLine;
     char oof;
-
-    iss >> turn;
-    iss.ignore();
-    
-    // get string sequences for each player
-    for (int i = 0; i < 4; ++i) {
-        std::getline(iss, playerLines.at(i));
+    std::vector<std::string> lins;
+    std::string lin;
+    std::shared_ptr<Board> b;
+    while (std::getline(iss, lin)) {
+        if (lin.size() > 0) {
+            lins.emplace_back(lin);
+        }
     }
 
-    // initialize board with board data
-    std::getline(iss, boardLine);
-    std::shared_ptr<Board> b = loadBoard(info, name, players, gen);
-    b->turn = turn;
-    std::cout << "populated turn" << std::endl;
+    if (lins.size() == 7) {
+        turn = std::stoi(lins.at(0));
 
-    // for each player, read in 5 ints, then g, then as many ints until c, then as many pairs as possible
-    for (int i = 0; i < 4; ++i) {
-        std::istringstream playerStream{playerLines[i]};
-        playerStream >> numCaf >> numLab >> numLec >> numStd >> numTut;
-        std::cout << "iteration #" << i << std::endl;
-
-        for (int i = 0; i < numCaf; ++i) {
-            b->data[i]->hand->cards.emplace_back(Resource::CAFF);
-        }
-        for (int j = 0; j < numLab; ++j) {
-            b->data[i]->hand->cards.emplace_back(Resource::LAB);
-        }
-        for (int j = 0; j < numLec; ++j) {
-            b->data[i]->hand->cards.emplace_back(Resource::LEC);
-        }
-        for (int j = 0; j < numStd; ++j) {
-            b->data[i]->hand->cards.emplace_back(Resource::STD);
-        }
-        for (int j = 0; j < numTut; ++j) {
-            b->data[i]->hand->cards.emplace_back(Resource::TUT);
+        for (int i = 1; i < 5; ++i) {
+            playerLines.emplace_back(lins.at(i));     
         }
 
-        playerStream >> oof; // reads 'g'
+        // initialize board with board data
+        b = loadBoard(lins.at(5), name, players, gen);
+        b->turn = turn;
+        
 
-        int n;
-        int m;
-        std::cout << "looping through goals and criterions" << std::endl;
-        while (playerStream >> n) {
-            b->goals.at(n)->buy_start(b->data[n].get());
+        // for each player, read in 5 ints, then g, then as many ints until c, then as many pairs as possible
+        for (int i = 0; i < 4; ++i) {
+            std::istringstream playerStream{playerLines.at(i)};
+            playerStream >> numCaf >> numLab >> numLec >> numStd >> numTut;
+            for (int i = 0; i < numCaf; ++i) {
+                hadd(b->data[i]->hand.get(), Resource::CAFF);
+            }
+            for (int j = 0; j < numLab; ++j) {
+                hadd(b->data[i]->hand.get(), Resource::LAB);
+            }
+            for (int j = 0; j < numLec; ++j) {
+                hadd(b->data[i]->hand.get(), Resource::LEC);
+            }
+            for (int j = 0; j < numStd; ++j) {
+                hadd(b->data[i]->hand.get(), Resource::STD);
+            }
+            for (int j = 0; j < numTut; ++j) {
+                hadd(b->data[i]->hand.get(), Resource::TUT);
+            }
+
+            playerStream >> oof; // reads 'g'
+
+            int n;
+            int m;
             char nextChar = playerStream.peek();
-            if (nextChar == 'c') {
-                playerStream.get(); // reads 'c'
-                break;
-            }
-            while (playerStream >> n >> m) {
-                b->criterions.at(n)->force_buy(b->data[n].get());
-                b->criterions.at(n)->setgreed(m);
-                b->criterions.at(n)->cost = b->criterions.at(n)->COSTS[m];
+            if (nextChar != 'c') {
+                while (playerStream >> n) {
+                    b->goals.at(n)->buy_start(b->data[i].get());
+                }
+                playerStream.clear();
+                playerStream.ignore();
+                    while (playerStream >> n >> m) {
+                        b->criterions.at(n)->force_buy(b->data[i].get());
+                        b->criterions.at(n)->setgreed(m);
+                        b->criterions.at(n)->cost = b->criterions.at(n)->COSTS[m-1];
+                    }
+            } else {
+                    playerStream >> oof;
+                  while (playerStream >> n >> m) {
+                        b->criterions.at(n)->force_buy(b->data[i].get());
+                        b->criterions.at(n)->setgreed(m);
+                        b->criterions.at(n)->cost = b->criterions.at(n)->COSTS[m-1];
+                    }
             }
         }
+        goose = stoi(lins.at(6));
+        if (goose >= 0) {
+            b->goose->move(b->tiles.at(goose).get());
+        }
+    } else if (lins.size() == 1) {
+        b = loadBoard(lins.at(0), name, players, gen);
     }
-    iss >> goose;
-    if (goose >= 0) {
-        b->goose->move(b->tiles.at(goose).get());
-    }
+    // get string sequences for each player
     return b;
 }
 
@@ -570,16 +587,19 @@ void PlayerData::turn(controller* cont) {
                 } else {
                     *cont << controller::Commands::MUST;
                 }
+                *cont << controller::Commands::MENU;
+                *cont << *hand;
                 break;
             }
             case Action::ROLL: {
                 if (!rol){
                     roll(b->dice.get(), cont);
                     rol = true;
-                    *cont << *b->dice.get();
                 } else {
                     *cont << controller::Commands::ALRROLL;
                 }
+                *cont << controller::Commands::MENU;
+                *cont << *hand;
                 break;
             }
             case Action::CRIT: {
@@ -599,6 +619,8 @@ void PlayerData::turn(controller* cont) {
             } else {
                     *cont << controller::Commands::MUST;
                 }
+                *cont << controller::Commands::MENU;
+                *cont << *hand;
                 break;
             }
             case Action::GOAL: {
@@ -618,10 +640,14 @@ void PlayerData::turn(controller* cont) {
                 } else {
                     *cont << controller::Commands::MUST;
                 }
+                *cont << controller::Commands::MENU;
+                *cont << *hand;
                 break;
             }
             case Action::BOARD: {
-                cont->board(*b); 
+                cont->board(*b);
+                *cont << controller::Commands::MENU;
+                *cont << *hand; 
                 break;
             }
             case Action::SAVE: {
@@ -632,6 +658,8 @@ void PlayerData::turn(controller* cont) {
                 } else {
                     *cont << controller::Commands::ALRROLL;
                 }
+                *cont << controller::Commands::MENU;
+                *cont << *hand;
                 break;
             }
             case Action::END: {
@@ -640,14 +668,19 @@ void PlayerData::turn(controller* cont) {
                 } else {
                     *cont << controller::Commands::MUST;
                 }
+                *cont << controller::Commands::MENU;
+                *cont << *hand;
                 break;
             }
             case Action::SWITCH: {
                 loaded_dice = !loaded_dice;
+                *cont << controller::Commands::MENU;
+                *cont << *hand;
                 break;
             }
             default:
                 *cont << controller::Commands::MENU;
+                *cont << *hand;
         }
     }
 }
@@ -815,7 +848,7 @@ void PlayerData::executeTrade(PlayerData* selectedPlayer, Hand* hand1, Hand* han
 }
 void run_turn (Board* b, controller* cont) {
     b->turn++;
-    b->data[b->turn%4]->turn(cont);
+    b->data[(b->turn-1)%4]->turn(cont);
 }
 
 PlayerData::~PlayerData(){

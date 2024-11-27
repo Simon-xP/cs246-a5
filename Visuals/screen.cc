@@ -32,7 +32,12 @@ void tcontroller::board(const Board& b){
             {
             case 'C':
                 if (b.criterions.at(c)->owner) {
-                    std::cout << b.players[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, c](const std::shared_ptr<PlayerData>& p) {return p.get() == b.criterions.at(c)->owner;}))]->colors[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, c](const std::shared_ptr<PlayerData>& p) {return p.get() == b.criterions.at(c)->owner;}))] << b.criterions.at(c)->getgreed();
+                    std::cout << "|" << b.players[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, c](const std::shared_ptr<PlayerData>& p) {return p.get() == b.criterions.at(c)->owner;}))]->colors[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, c](const std::shared_ptr<PlayerData>& p) {return p.get() == b.criterions.at(c)->owner;}))] << b.criterions.at(c)->getgreed() << "|";
+                    if (j + 1 < BOARD_COLUMNS && layout.at(i).at(j+1) != ' ') {
+						std::cout << " --";
+					}else {
+                        std::cout << "         ";
+                    }
                 } else {
                     if (c >= 10) {
                     std::cout << "|" << c << "|";
@@ -55,6 +60,11 @@ void tcontroller::board(const Board& b){
             case 'E':
                 if (b.goals.at(e)->owner) {
                     std::cout << b.players[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, e](const std::shared_ptr<PlayerData>& p) {return p.get() == b.goals.at(e)->owner;}))]->colors[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, e](const std::shared_ptr<PlayerData>& p) {return p.get() == b.goals.at(e)->owner;}))] <<" ";
+                if (j + 1 < BOARD_COLUMNS && layout.at(i).at(j+1) != ' ') {
+						std::cout << "-- ";
+					} else {
+                            std::cout << "                ";
+                    }
                 } else {
                     std::cout << e;
 					if (j + 1 < BOARD_COLUMNS && layout.at(i).at(j+1) != ' ') {

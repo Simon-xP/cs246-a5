@@ -14,6 +14,7 @@ void Dice::notifyObservers() {
 
 void Dice::setValue(int num, PlayerData* p, controller* cont){
     val = num;
+    *cont << *this;
     if (num == 7) {
         p->goosefy(cont);
     } else {
