@@ -225,6 +225,16 @@ std::shared_ptr<Board> makeBoard(std::string name, std::shared_ptr<Player> playe
                         tempb.at(i-1).at(j-2)->ajacent1.emplace_back(tempb.at(i).at(j));
                     }
                 }
+                if (i - 2 >= 0){
+                    if (layout.at(i-2).at(j) == 'E') {
+                        tempb.at(i-2).at(j)->ajacent1.emplace_back(tempb.at(i).at(j));
+                    }
+                }
+                if (i + 2 < BOARD_ROWS){
+                    if (layout.at(i+2).at(j) == 'E') {
+                        tempb.at(i+2).at(j)->ajacent1.emplace_back(tempb.at(i).at(j));
+                    }
+                }
 
                 break;
             case 'T':
@@ -348,6 +358,7 @@ std::shared_ptr<Board> loadGameState(std::string info, std::string name, std::sh
                     while (playerStream >> n >> m) {
                         b->criterions.at(n)->force_buy(b->data[i].get());
                         b->criterions.at(n)->setgreed(m);
+                        b->data[i]->points = b->data[i]->points + m - 1;
                         b->criterions.at(n)->cost = b->criterions.at(n)->COSTS[m-1];
                     }
             } else {
@@ -355,6 +366,7 @@ std::shared_ptr<Board> loadGameState(std::string info, std::string name, std::sh
                   while (playerStream >> n >> m) {
                         b->criterions.at(n)->force_buy(b->data[i].get());
                         b->criterions.at(n)->setgreed(m);
+                        b->data[i]->points = b->data[i]->points + m - 1;
                         b->criterions.at(n)->cost = b->criterions.at(n)->COSTS[m-1];
                     }
             }
@@ -379,13 +391,13 @@ std::ostream& operator<<(std::ostream &os, const PlayerData& player) {
     os << "g" << " ";
     for (const auto& edge : player.edges) {
         if (edge) {
-            os << " " << edge->index;
+            os << edge->index << " ";
         }
     }
     os << "c" << " ";
     for (const auto& corner : player.corners) {
         if (corner) {
-            os << " " << corner->index << " " << corner->getgreed();
+            os << corner->index << " " << corner->getgreed() << " ";
         }
     }
     os << std::endl;
@@ -655,12 +667,12 @@ void PlayerData::turn(controller* cont) {
                 break;
             }
             case Action::SAVE: {
-                if (!rol){
+                if (rol){
                     *cont << controller::Commands::SFILENAME; // "enter filename:"
                     *cont >> saveFile;
                     b->saveBoard(saveFile, cont);
                 } else {
-                    *cont << controller::Commands::ALRROLL;
+                    *cont << controller::Commands::MUST;
                 }
                 *cont << controller::Commands::MENU;
                 *cont << *hand;
@@ -805,7 +817,7 @@ void PlayerData::Trade(controller* cont) {
             std::string response;
             cont->accept(b->players[selectedPlayeri].get());
             *cont >> response;
-            if (response == "y" && hasResourcesForTrade(selectedHand2.get())) {
+            if (response == "y" && selectedPlayer->hasResourcesForTrade(selectedHand2.get())) {
                 // Execute the trade if the player accepts
                 executeTrade(selectedPlayer, selectedHand1.get(), selectedHand2.get());
                 return;  // End trade once successful
@@ -817,8 +829,9 @@ void PlayerData::Trade(controller* cont) {
 
 // Helper function to check if the player has enough resources for the trade
 bool PlayerData::hasResourcesForTrade(const Hand* selectedHand) {
+    Hand h = *selectedHand;
     for (auto& card : selectedHand->cards) {
-        if (herr(hand.get(), card) < 1) {  // Not enough of the selected card
+        if (herr(hand.get(), card) < herr(&h, card)) {  // Not enough of the selected card
             return false;
         }
     }
