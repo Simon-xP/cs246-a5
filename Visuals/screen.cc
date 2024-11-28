@@ -10,6 +10,10 @@ void tcontroller::chooseplayer(const Player* p[3]){
         std::cout << "Choose Player" << std::endl;
         while (p[x]) {
             std::cout << x << ": " << p[x]->Name << std::endl;
+            x++;
+            if (x == 3) {
+                break;
+            }
         }
     }
 }
@@ -59,21 +63,22 @@ void tcontroller::board(const Board& b){
                 break;
             case 'E':
                 if (b.goals.at(e)->owner) {
-                    std::cout << b.players[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, e](const std::shared_ptr<PlayerData>& p) {return p.get() == b.goals.at(e)->owner;}))]->colors[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, e](const std::shared_ptr<PlayerData>& p) {return p.get() == b.goals.at(e)->owner;}))] <<" ";
+						std::cout << " "<< b.players[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, e](const std::shared_ptr<PlayerData>& p) {return p.get() == b.goals.at(e)->owner;}))]->colors[std::distance(b.data, std::find_if(b.data, b.data + 3, [b, e](const std::shared_ptr<PlayerData>& p) {return p.get() == b.goals.at(e)->owner;}))];
                 if (j + 1 < BOARD_COLUMNS && layout.at(i).at(j+1) != ' ') {
-						std::cout << "-- ";
+                        std::cout << "-- ";
 					} else {
-                            std::cout << "                ";
+                            std::cout << "               ";
                     }
                 } else {
-                    std::cout << e;
+                    
 					if (j + 1 < BOARD_COLUMNS && layout.at(i).at(j+1) != ' ') {
+                        std::cout << e;
 						std::cout << "-- ";
 					} else {
                         if (e < 10){
-                            std::cout << "                ";
+                            std::cout <<" " << e << "               ";
                         } else {
-                            std::cout << "               ";
+                            std::cout << e << "               ";
                         }
                     }
                 }
@@ -100,7 +105,7 @@ void tcontroller::board(const Board& b){
                 break;
 
             case '2':
-                std::cout << "                                      ";
+                std::cout << "                                     ";
                 break;
 
             case '3':

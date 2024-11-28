@@ -480,7 +480,7 @@ PlayerData* PlayerData::selectPlayerToStealFrom(const std::vector<PlayerData*>& 
     *cont << controller::Commands::STEAL;
 
     // Display the list of available options
-    Player* pl[3];
+    Player* pl[3]{nullptr,nullptr, nullptr};
     for (size_t i = 0; i < options.size(); ++i) {
         pl[i] = b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [options, i](const std::shared_ptr<PlayerData>& p) {return p.get() == options[i];}))].get();
     }
@@ -510,6 +510,7 @@ void PlayerData::goosefy(controller* cont){
     if (target) {
         b->goose->move(target);
         std::vector <PlayerData*> options;
+        stealify(b);
         for (std::shared_ptr<PlayerData> i : b->data) {
             if ((i->can_steal) && (i.get() != this)){
                 options.emplace_back(i.get());
@@ -793,34 +794,22 @@ void PlayerData::Trade(controller* cont) {
         } else {
             break; // Valid input
         }
-    }
-    PlayerData* selectedPlayer = b->data[selectedPlayeri].get();
-    Hand* sh2 =selectedHand2.get();
-        while (selectedPlayer) {
-            if (std::all_of(selectedPlayer->hand->cards.begin(), selectedPlayer->hand->cards.end(), [selectedPlayer, sh2](Resource i) {
-                    return herr(selectedPlayer->hand.get(), i) >= herr(sh2, i);
-                })) {
+        }
+        PlayerData* selectedPlayer = b->data[selectedPlayeri].get();
 
-                // Ask all other players to accept or decline the trade
-                cont->offer(b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [this](const std::shared_ptr<PlayerData>& p) {return p.get() == this;}))].get(), *selectedHand1, *selectedHand2);
-                for (std::shared_ptr<PlayerData> p : b->data) {
-                    if (p.get() != this) {
-                        std::string response;
-                        cont->accept(b->players[std::distance(b->data, std::find(b->data, b->data + 3, p))].get());
-                        *cont >> response;
-                        if (response == "y" && hasResourcesForTrade(selectedHand2.get())) {
-                            // Execute the trade if the player accepts
-                            executeTrade(selectedPlayer, selectedHand1.get(), selectedHand2.get());
-                            return;  // End trade once successful
-                        }
-                    }
-                }
-            } else {
-                 *cont << controller::Commands::INVTRADE;
-                selectedPlayer = nullptr;  // No valid player for the trade
+
+        if (selectedPlayer != this) {
+            std::string response;
+            cont->accept(b->players[selectedPlayeri].get());
+            *cont >> response;
+            if (response == "y" && hasResourcesForTrade(selectedHand2.get())) {
+                // Execute the trade if the player accepts
+                executeTrade(selectedPlayer, selectedHand1.get(), selectedHand2.get());
+                return;  // End trade once successful
             }
         }
     }
+    *cont << controller::Commands::INVTRADE;
 }
 
 // Helper function to check if the player has enough resources for the trade
@@ -859,6 +848,17 @@ PlayerData::~PlayerData(){
 
 }
 
+void stealify(Board* b){
+    for (auto p : b->data){
+        for (auto e : p->eyes) {
+            for (auto c: e->subject->eyes){
+                if (c->subject->goosed) {
+                    p->can_steal = true;
+                }
+            }
+        }
+    }
+}
 Board::~Board() {
 
 }

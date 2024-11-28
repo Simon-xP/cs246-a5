@@ -41,6 +41,7 @@ class Tile: public Observer, public Subject{
                 return Producer{Resource::UM, 1};
             }
         }
+        void stealify();
         int getStateD() const override { return 0; };
         Hand getStateC() const override { return Hand{}; };
         ~Tile() override;

@@ -17,6 +17,7 @@ class Player;
 class Board;
 class Tile;
 class controller;
+class courseobs;
 
 class Goose { 
     public:
@@ -62,7 +63,7 @@ class PlayerData{
         std::vector <Criteria*> corners;
         std::vector <Goal*> edges;
         Board* b;
-        std::vector <std::shared_ptr<Observer>> eyes;
+        std::vector <std::shared_ptr<courseobs>> eyes;
         bool can_steal = false;
         bool loaded_dice = false;
         void gain(Hand h);
@@ -96,5 +97,5 @@ class Object {
 std::vector<Resource> getTileOrder(std::mt19937 *gen);
 std::shared_ptr<Board> generateBoard(std::string name, std::shared_ptr<Player> players[4], std::mt19937* gen);
 void firstTurn(Board* board, controller* cont);
-
+void stealify(Board* b);
 #endif

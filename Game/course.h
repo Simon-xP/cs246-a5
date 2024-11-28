@@ -12,6 +12,7 @@ class courseobs;
 class tileobs: public Observer{
         Tile* subject;  
     public:
+        friend void stealify(Board* b);
         Criteria* owner;
         tileobs(Tile* subject);
         void notify() override;
@@ -29,7 +30,7 @@ class Criteria: public Object, public Subject{
         Hand{std::vector <Resource> {Resource::CAFF,Resource::CAFF,Resource::CAFF,Resource::LAB, Resource::LAB,Resource::LEC,Resource::LEC, Resource::TUT, Resource::STD, Resource::STD}}};
         int index;
         ~Criteria() override;
-        std::vector <std::shared_ptr<Observer>> eyes;
+        std::vector <std::shared_ptr<tileobs>> eyes;
         std::vector <Criteria*> neighbours;
         std::vector <Goal*> ajacent;
         std::vector <Tile*> tiles;
@@ -52,6 +53,7 @@ class courseobs: public Observer{
     Criteria* subject;
     PlayerData* owner;
     public:
+        friend void stealify(Board* b);
         courseobs(Criteria* subject, PlayerData* p);
         void notify() override;
         ~courseobs() override;

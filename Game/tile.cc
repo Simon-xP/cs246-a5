@@ -17,9 +17,8 @@ void Dice::setValue(int num, PlayerData* p, controller* cont){
     *cont << *this;
     if (num == 7) {
         p->goosefy(cont);
-    } else {
-        notifyObservers();
-    }
+    } 
+    notifyObservers();
 }
 
 Tile::Tile(Dice* subject): subject{subject}{
