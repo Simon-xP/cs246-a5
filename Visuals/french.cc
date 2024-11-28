@@ -1,13 +1,14 @@
 #include "screen.h"
 #include "course.h"
+#include "french.h"
 #include <vector>
 #include <algorithm>
 
 
-void tcontroller::chooseplayer(const Player* p[3]){
+void frenchTController::chooseplayer(const Player* p[3]){
     int x = 0;
     if (p[0]) {
-        std::cout << "Choose Player" << std::endl;
+        std::cout << "Choisir un joueur" << std::endl;
         while (p[x]) {
             std::cout << x << ": " << p[x]->Name << std::endl;
             x++;
@@ -18,12 +19,12 @@ void tcontroller::chooseplayer(const Player* p[3]){
     }
 }
 
-void tcontroller::accept(const Player* p){
-    std::cout << p->Name << ", do you accept the trade? (type y for yes): ";
+void frenchTController::accept(const Player* p){
+    std::cout << p->Name << ", acceptez-vous l'échange ? (tapez y pour oui) : ";
  }
 
-void tcontroller::board(const Board& b){
-    std::string resour[6] = {"Caffeine", "Lab", "Lecture", "Study", "Tutorial", "Netflix"};
+void frenchTController::board(const Board& b){
+    std::string resour[6] = {"Caféine", "Labo", "Cours", "Étude", "Tutoriel", "Netflix"};
     int c = 0;
     int e = 0;
     int t = 0;
@@ -95,7 +96,7 @@ void tcontroller::board(const Board& b){
                         std::cout << b.tiles.at(t)->dieVal << "       ";
                     }
                 } else{
-                    std::cout <<"frick";
+                    std::cout <<"frique";
                 }
                 t++;
                 break;
@@ -267,12 +268,12 @@ void tcontroller::board(const Board& b){
     std::cout << std::endl;
 }
 
-void tcontroller::turn(const Player& p, const int& i){
-    std::cout << "\n--- TURN " << i << " ---" << std::endl;
-    std::cout << "\n--- Player " << p.Name << "'s Turn ---" << std::endl;
+void frenchTController::turn(const Player& p, const int& i){
+    std::cout << "\n--- TOUR " << i << " ---" << std::endl;
+    std::cout << "\n--- Tour de joueur " << p.Name << " ---" << std::endl;
 }
 
-controller& tcontroller::operator<<(const PlayerData& player) {
+controller& frenchTController::operator<<(const PlayerData& player) {
     std::cout << player.getAmountResource(Resource::CAFF)
        << player.getAmountResource(Resource::LAB)
        << player.getAmountResource(Resource::LEC)
@@ -294,31 +295,31 @@ controller& tcontroller::operator<<(const PlayerData& player) {
     return *this;
 }
 
-void tcontroller::winner(const Player& p, const int& i){
-    std::cout << "\n--- Winner " << p.Name << " ---" << std::endl;
+void frenchTController::winner(const Player& p, const int& i){
+    std::cout << "\n--- Gagnant " << p.Name << " ---" << std::endl;
 }
 
-void tcontroller::showhand(const Hand& b, const Player& p){
-    std::cout << "\n--- " << p.Name << "'s Hand ---" << std::endl;
+void frenchTController::showhand(const Hand& b, const Player& p){
+    std::cout << "\n--- Main de " << p.Name << " ---" << std::endl;
     *this << b;
 }
 
-controller& tcontroller::operator<<(const Resource resource){
+controller& frenchTController::operator<<(const Resource resource){
     switch (resource) {
         case Resource::CAFF:
-            std::cout << "Caffeine";
+            std::cout << "Caféine";
             break;
         case Resource::LEC:
-            std::cout << "Lecture";
+            std::cout << "Cours";
             break;
         case Resource::LAB:
-            std::cout << "Lab";
+            std::cout << "Labo";
             break;
         case Resource::STD:
-            std::cout << "Study";
+            std::cout << "Étude";
             break;
         case Resource::TUT:
-            std::cout << "Tutorial";
+            std::cout << "Tutoriel";
             break;
         default:
             break;
@@ -326,27 +327,27 @@ controller& tcontroller::operator<<(const Resource resource){
     return *this;
 }
 
-controller& tcontroller::operator<<(const std::vector<Resource> resources){
+controller& frenchTController::operator<<(const std::vector<Resource> resources){
     for (auto i : resources) {
         *this << i;
     }
     return *this;
 }
 
-controller& tcontroller::operator<<(const Commands c) {
+controller& frenchTController::operator<<(const Commands c) {
     switch (c) {
         case MENU:
-            std::cout << "\nWhat would you like to do?" << std::endl;
-            std::cout << "0. Trade" << std::endl;
-            std::cout << "1. Roll the dice" << std::endl;
-            std::cout << "2. Buy a Criteria" << std::endl;
-            std::cout << "3. Buy a Goal" << std::endl;
-            std::cout << "4. View game board" << std::endl;
-            std::cout << "5. Switch Dice Type" << std::endl;
-            std::cout << "6. End turn" << std::endl;
-            std::cout << "7. Save" << std::endl;
-            std::cout << "8. Leave Game" << std::endl;
-            std::cout << "Enter your choice: \n";
+            std::cout << "\nQu'aimeriez-vous faire ?" << std::endl;
+            std::cout << "0. Échange" << std::endl;
+            std::cout << "1. Lancer les dés" << std::endl;
+            std::cout << "2. Acheter un Critère" << std::endl;
+            std::cout << "3. Acheter un Objectif" << std::endl;
+            std::cout << "4. Voir le tableau de jeu" << std::endl;
+            std::cout << "5. Changer le type de dés" << std::endl;
+            std::cout << "6. Terminer le tour" << std::endl;
+            std::cout << "7. Sauvegarder" << std::endl;
+            std::cout << "8. Quitter le jeu" << std::endl;
+            std::cout << "Indiquez votre choix: \n";
             break;
 
         case RESET:
@@ -354,109 +355,109 @@ controller& tcontroller::operator<<(const Commands c) {
             break;
 
         case MOVEG:
-            std::cout << "Select a target tile (number between 0 and 18): ";
+            std::cout << "Sélectionnez une tuile (numéro entre 0 et 18) : ";
             break;
 
         case TRADE1:
-            std::cout << "Select cards to give: ";
+            std::cout << "Sélectionnez les cartes à offrir : ";
             break;
 
         case TRADE2:
-            std::cout << "Select cards to Recieve: ";
+            std::cout << "Sélectionnez les cartes à recevoir : ";
             break;
 
         case TRADE3:
-            std::cout << "Player Choose: ";
+            std::cout << "Choisir un joueur : ";
             break;
 
         case STEAL:
-            std::cout << "Select a player to steal from: ";
+            std::cout << "Sélectionnez un joueur à voler : ";
             break;
 
         case FIRSTGOAL:
-            std::cout << "Choose a Goal to buy (enter its index): ";
+            std::cout << "Choisissez un Objectif à acheter (entrez son indice) : ";
             break;
 
         case FIRSTCRIT:
-            std::cout << "Choose a Criteria to buy (enter its index): ";
+            std::cout << "Choisissez un Critère à acheter (entrez son indice) : ";
             break;
 
         case CHOOSECRIT:
-            std::cout << "Choose a Criteria to buy (enter its index): ";
+            std::cout << "Choisissez un Critère à acheter (entrez son indice) : ";
             break;
 
         case CHOOSEGOAL:
-            std::cout << "Choose a Goal to buy (enter its index): ";
+            std::cout << "Choisissez un Objectif à acheter (entrez son indice) : ";
             break;
 
         case INVALIDGOAL:
-            std::cout << "Invalid Goal index!" << std::endl;
+            std::cout << "Index de l'Objectif invalide !" << std::endl;
             break;
 
         case INVALIDCRIT:
-            std::cout << "Invalid Criteria index!" << std::endl;
+            std::cout << "Index de Critère invalide !" << std::endl;
             break;
 
         case INVALIDPLAYER:
-            std::cout << "Invalid player selection!" << std::endl;
+            std::cout << "Sélection de joueur invalide !" << std::endl;
             break;
 
         case ROLL:
-            std::cout << "Rolling the dice again..." << std::endl;
+            std::cout << "Les dés sont jetés..." << std::endl;
             break;
         
         case SAVEBOARD:
-            std::cout << "Saving to file..." << std::endl;
+            std::cout << "Enregistrement dans un fichier..." << std::endl;
             break;
 
         case SFILENAME:
-            std::cout << "Enter the filename: " << std::endl;
+            std::cout << "Saisir le nom du fichier : " << std::endl;
             break;
 
         case END:
-            std::cout << "Ending your turn." << std::endl;
+            std::cout << "Fin de votre tour." << std::endl;
             break;
 
         case AFDGOAL:
-            std::cout << "Not enough resources or invalid action to buy Goal!" << std::endl;
+            std::cout << "Pas assez de ressources ou d'actions non valides pour acheter un Objectif !" << std::endl;
             break;
 
         case AFDCRIT:
-            std::cout << "Not enough resources or invalid action to buy Criteria!" << std::endl;
+            std::cout << "Pas assez de ressources ou d'actions non valides pour acheter un Critère !" << std::endl;
             break;
 
         case INVALIDNUM:
-            std::cout << "Invalid number entered. Please try again." << std::endl;
+            std::cout << "Le numéro saisi n'est pas valide. Veuillez réessayer." << std::endl;
             break;
 
         case NOPLAY:
-            std::cout << "No players available to steal from." << std::endl;
+            std::cout << "Il n'y a pas de joueurs disponibles à voler." << std::endl;
             break;
         case ALRROLL:
-            std::cout << "Already Rolled This Turn" << std::endl;
+            std::cout << "Déjà lancé les dés ce tour-ci" << std::endl;
             break;
 
         case INVTRADE:
-            std::cout << "Invalid Trade" << std::endl;
+            std::cout << "Échange non valide" << std::endl;
             break;
         case RES:
-            std::cout << "Enter the quantities of resources (Caffeine, Lab, Lecture, Study, Tutorial):\n";
+            std::cout << "Saisissez les quantités de ressources (caféine, labo, cours, étude, tutoriel) :\n";
             break;
         case MUST:
-            std::cout << "YOU MUST ROLL FIRST\n";
+            std::cout << "VOUS DEVEZ D'ABORD LANCER LE DÉ\n";
             break;
         case PICK:
-            std::cout << "PICK YOUR ROLL\n";
+            std::cout << "CHOISISSEZ VOTRE JET DE DÉ\n";
             break;
 
         default:
-            std::cout << "Unknown command!" << std::endl;
+            std::cout << "Commande inconnue !" << std::endl;
             break;
     }
     return *this;
 }
 
-controller& tcontroller::operator<<(const Hand& c){
+controller& frenchTController::operator<<(const Hand& c){
     Hand ca = c;
     std::sort(ca.cards.begin(), ca.cards.end());
     for (Resource r : ca.cards){
@@ -465,17 +466,17 @@ controller& tcontroller::operator<<(const Hand& c){
     std::cout << std::endl;
     return *this;
 }
-controller& tcontroller::operator<<(const std::string& c){
+controller& frenchTController::operator<<(const std::string& c){
     std::cout << c;
     return *this;
 }
 
-controller& tcontroller::operator<<(const Dice& c){
-    std::cout << "ROLL IS: " << c.getStateD() << std::endl;
+controller& frenchTController::operator<<(const Dice& c){
+    std::cout << "LE JET DE DÉS EST : " << c.getStateD() << std::endl;
     return *this;
 }
 
-controller& tcontroller::operator>>(Action& c){
+controller& frenchTController::operator>>(Action& c){
     int temp;
     while (true){
         if (std::cin >> temp) {
@@ -494,7 +495,7 @@ controller& tcontroller::operator>>(Action& c){
     return *this;
 }
 
-controller& tcontroller::operator>>(int& c){
+controller& frenchTController::operator>>(int& c){
     int temp;
     while (true){
         if (std::cin >> temp) {
@@ -509,7 +510,7 @@ controller& tcontroller::operator>>(int& c){
     return *this;
 }
 
-controller& tcontroller::operator>>(std::string& c){
+controller& frenchTController::operator>>(std::string& c){
     std::string temp;
     while (true){
         if (std::cin >> temp) {
@@ -524,21 +525,21 @@ controller& tcontroller::operator>>(std::string& c){
     return *this;
 }
 
-void tcontroller::offer(const Player* p, Hand& h1, Hand& h2){
+void frenchTController::offer(const Player* p, Hand& h1, Hand& h2){
 std:: cout << p->Name << ": " << std::endl;
 *this << h1;
-std::cout << " for ";
+std::cout << " pour ";
 *this << h2;
 std::cout << std::endl;
 }
 
-void tcontroller::accept(const Player* p) {
+void frenchTController::accept(const Player* p) {
 
-    std::cout << p->Name << " DO YOU ACCEPT?  (enter y to accept)" << std::endl;
+    std::cout << p->Name << " ACCEPTEZ-VOUS ?  (inscrire y pour accepter)" << std::endl;
 }
 
-void tcontroller::reso(const Resource r){
-    std::cout << "Enter quantity for ";
+void frenchTController::reso(const Resource r){
+    std::cout << "Saisir la quantité pour ";
     *this << r;
     std::cout <<  ": ";
  }
@@ -552,4 +553,3 @@ void ResourceCollection::inputResources(controller* cont) {
         *cont >> resources[i];
     }
 }
-

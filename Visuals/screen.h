@@ -92,6 +92,7 @@ class tcontroller: public controller{
         controller& operator>>(std::string& c) override;
 };
 
+
 class ResourceCollection {
 public:
     int resources[5];
