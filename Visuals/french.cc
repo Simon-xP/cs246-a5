@@ -457,15 +457,6 @@ controller& frenchTController::operator<<(const Commands c) {
     return *this;
 }
 
-controller& frenchTController::operator<<(const Hand& c){
-    Hand ca = c;
-    std::sort(ca.cards.begin(), ca.cards.end());
-    for (Resource r : ca.cards){
-        *this << r << " "; // Cast to int for resource enum display
-    }
-    std::cout << std::endl;
-    return *this;
-}
 controller& frenchTController::operator<<(const std::string& c){
     std::cout << c;
     return *this;
@@ -533,23 +524,70 @@ std::cout << " pour ";
 std::cout << std::endl;
 }
 
-void frenchTController::accept(const Player* p) {
-
-    std::cout << p->Name << " ACCEPTEZ-VOUS ?  (inscrire y pour accepter)" << std::endl;
-}
-
 void frenchTController::reso(const Resource r){
     std::cout << "Saisir la quantité pour ";
     *this << r;
     std::cout <<  ": ";
  }
 
-void ResourceCollection::inputResources(controller* cont) {
-    *cont << controller::Commands::RES;
+controller& frenchTController::operator<<(const Hand& c) {
+    int numCaffeines = std::count(c.cards.begin(), c.cards.end(), Resource::CAFF);
+    int numLabs = std::count(c.cards.begin(), c.cards.end(), Resource::LAB);
+    int numLectures = std::count(c.cards.begin(), c.cards.end(), Resource::LEC);
+    int numTutorials = std::count(c.cards.begin(), c.cards.end(), Resource::TUT);
+    int numStudies = std::count(c.cards.begin(), c.cards.end(), Resource::STD);
 
-    // Loop through each resource and prompt for input
-    for (int i = 0; i < 5; ++i) {
-        cont->reso(static_cast<Resource>(i));
-        *cont >> resources[i];
+    std::cout << numCaffeines << " caféines, "
+              << numLabs << " labos, "
+              << numLectures << " cours, "
+              << numTutorials << " tutoriels, et "
+              << numStudies << " études." << std::endl;
+
+    return *this;
+}
+
+void frenchTController::printstatus(const PlayerData& data) {
+    // 'B', 'R', 'O', 'Y'
+    std::string color;
+    if (data.b->data[0].get() == &data) {
+        color = "Bleu";
+    } else if (data.b->data[1].get() == &data) {
+        color = "Rouge";
+    } else if (data.b->data[2].get() == &data) {
+        color = "Orange";
+    } else if (data.b->data[3].get() == &data) {
+        color = "Jaune";
+    } else {
+        std::cout << "uh oh" << std::endl;
+        color = "wrongcolor";
+    }
+    
+    std::cout << color << " a " << data.points << " points, " << data.hand.get() << std::endl;
+}
+
+void frenchTController::printcompletions(const PlayerData& data) {
+    // 'B', 'R', 'O', 'Y'
+    std::string color;
+    if (data.b->data[0].get() == &data) {
+        color = "Bleu";
+    } else if (data.b->data[1].get() == &data) {
+        color = "Rouge";
+    } else if (data.b->data[2].get() == &data) {
+        color = "Orange";
+    } else if (data.b->data[3].get() == &data) {
+        color = "Jaune";
+    } else {
+        std::cout << "uh oh" << std::endl;
+    }
+
+    std::cout << color << " a completé :" << std::endl;
+    int idx;
+    for (Criteria* c : data.corners) {
+        for (int i = 0; i <= 53; ++i) { // 53 is max criterion index
+            if (data.b->criterions[i].get() == c) {
+                idx = i;
+            }
+        }
+        std::cout << idx << " " << data.b->criterions[idx].get()->getgreed() << std::endl;
     }
 }

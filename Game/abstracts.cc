@@ -604,7 +604,6 @@ void PlayerData::turn(controller* cont) {
                     *cont << controller::Commands::MUST;
                 }
                 *cont << controller::Commands::MENU;
-                *cont << *hand;
                 break;
             }
             case Action::ROLL: {
@@ -615,7 +614,6 @@ void PlayerData::turn(controller* cont) {
                     *cont << controller::Commands::ALRROLL;
                 }
                 *cont << controller::Commands::MENU;
-                *cont << *hand;
                 break;
             }
             case Action::CRIT: {
@@ -636,7 +634,6 @@ void PlayerData::turn(controller* cont) {
                     *cont << controller::Commands::MUST;
                 }
                 *cont << controller::Commands::MENU;
-                *cont << *hand;
                 break;
             }
             case Action::GOAL: {
@@ -657,13 +654,11 @@ void PlayerData::turn(controller* cont) {
                     *cont << controller::Commands::MUST;
                 }
                 *cont << controller::Commands::MENU;
-                *cont << *hand;
                 break;
             }
             case Action::BOARD: {
                 cont->board(*b);
                 *cont << controller::Commands::MENU;
-                *cont << *hand; 
                 break;
             }
             case Action::SAVE: {
@@ -675,28 +670,42 @@ void PlayerData::turn(controller* cont) {
                     *cont << controller::Commands::MUST;
                 }
                 *cont << controller::Commands::MENU;
-                *cont << *hand;
                 break;
             }
             case Action::END: {
                 if (rol) {
-                turnActive = false;
+                    turnActive = false;
                 } else {
                     *cont << controller::Commands::MUST;
                 }
                 *cont << controller::Commands::MENU;
-                *cont << *hand;
+                break;
+            }
+            case Action::STATUS: {
+                *cont << controller::Commands::VIEWSTATUS;
+                int index;
+                *cont >> index;
+                if (index >= 0 && index < 4) {
+                    cont->printstatus(*(b->data[index]));
+                }
+                break;
+            }
+            case Action::COMPLETIONS: {
+                *cont << controller::Commands::VIEWCOMP;
+                int index;
+                *cont >> index;
+                if (index >= 0 && index < 4) {
+                    cont->printcompletions(*(b->data[index]));
+                }
                 break;
             }
             case Action::SWITCH: {
                 loaded_dice = !loaded_dice;
                 *cont << controller::Commands::MENU;
-                *cont << *hand;
                 break;
             }
             default:
                 *cont << controller::Commands::MENU;
-                *cont << *hand;
         }
     }
 }

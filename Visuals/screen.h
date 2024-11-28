@@ -15,7 +15,7 @@ enum class Resource;
 class Dice;
 class PlayerData;
 
-enum Action {TRADE, ROLL, CRIT, GOAL, BOARD, SWITCH, END, SAVE, EXIT};
+enum Action {TRADE, ROLL, CRIT, GOAL, BOARD, SWITCH, STATUS, COMPLETIONS, END, SAVE, EXIT};
 
 class controller {
     protected:
@@ -24,7 +24,7 @@ class controller {
     public:
         enum Commands {MENU, RESET, MOVEG, TRADE1, TRADE2, STEAL, FIRSTGOAL, FIRSTCRIT, CHOOSECRIT, CHOOSEGOAL,
         INVALIDGOAL, INVALIDCRIT, INVALIDPLAYER, ROLL, SAVEBOARD, END, AFDGOAL, AFDCRIT, INVALIDNUM, NOPLAY, ALRROLL, TRADE3, INVTRADE,
-        RES, MUST, PICK, SFILENAME};
+        RES, MUST, PICK, SFILENAME, VIEWCOMP, VIEWSTATUS};
         virtual void chooseplayer(const Player* p[3]) = 0;
         virtual void offer(const Player* p, Hand& h1, Hand& h2) = 0;
         virtual void accept(const Player* p) = 0;
@@ -33,6 +33,8 @@ class controller {
         virtual void turn(const Player& p, const int& i) = 0;
         virtual void winner(const Player& p, const int& i) = 0;
         virtual void showhand(const Hand& b, const Player& p) = 0;
+        virtual void printstatus(const PlayerData& data) = 0;
+        virtual void printcompletions(const PlayerData& data) = 0;
         virtual controller& operator<<(const Resource resource) = 0;
         virtual controller& operator<<(const std::vector<Resource> resources) = 0;
         virtual  controller& operator<<(const std::string& c) = 0;
@@ -58,6 +60,8 @@ class gcontroller: public controller{
         void turn(const Player& p, const int& i)override;
         void winner(const Player& p, const int& i)override;
         void showhand(const Hand& b, const Player& p)override;
+        void printstatus(const PlayerData& data) override;
+        void printcompletions(const PlayerData& data) override;
         controller& operator<<(const Resource resource) override;
         controller& operator<<(const std::vector<Resource> resources) override;
         controller& operator<<(const std::string& c) override;
@@ -80,6 +84,8 @@ class tcontroller: public controller{
         void turn(const Player& p, const int& i)override;
         void winner(const Player& p, const int& i)override;
         void showhand(const Hand& b, const Player& p)override;
+        void printstatus(const PlayerData& data) override;
+        void printcompletions(const PlayerData& data) override;
         controller& operator<<(const Resource resource) override;
         controller& operator<<(const std::vector<Resource> resources) override;
         controller& operator<<(const std::string& c) override;

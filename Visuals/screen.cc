@@ -343,9 +343,11 @@ controller& tcontroller::operator<<(const Commands c) {
             std::cout << "3. Buy a Goal" << std::endl;
             std::cout << "4. View game board" << std::endl;
             std::cout << "5. Switch Dice Type" << std::endl;
-            std::cout << "6. End turn" << std::endl;
-            std::cout << "7. Save" << std::endl;
-            std::cout << "8. Leave Game" << std::endl;
+            std::cout << "6. Print Player Status" << std::endl;
+            std::cout << "7. Print Player Completions" << std::endl;
+            std::cout << "8. End turn" << std::endl;
+            std::cout << "9. Save" << std::endl;
+            std::cout << "10. Leave Game" << std::endl;
             std::cout << "Enter your choice: \n";
             break;
 
@@ -448,7 +450,12 @@ controller& tcontroller::operator<<(const Commands c) {
         case PICK:
             std::cout << "PICK YOUR ROLL\n";
             break;
-
+        case VIEWCOMP: 
+            std::cout << "Which player index do you want to view the completions of?\n";
+            break;
+        case VIEWSTATUS: 
+            std::cout << "Which player index do you want to view the status of?\n";
+            break;
         default:
             std::cout << "Unknown command!" << std::endl;
             break;
@@ -456,15 +463,68 @@ controller& tcontroller::operator<<(const Commands c) {
     return *this;
 }
 
-controller& tcontroller::operator<<(const Hand& c){
-    Hand ca = c;
-    std::sort(ca.cards.begin(), ca.cards.end());
-    for (Resource r : ca.cards){
-        *this << r << " "; // Cast to int for resource enum display
+void tcontroller::printstatus(const PlayerData& data) {
+    // 'B', 'R', 'O', 'Y'
+    std::string color;
+    if (data.b->data[0].get() == &data) {
+        color = "Blue";
+    } else if (data.b->data[1].get() == &data) {
+        color = "Red";
+    } else if (data.b->data[2].get() == &data) {
+        color = "Orange";
+    } else if (data.b->data[3].get() == &data) {
+        color = "Yellow";
+    } else {
+        std::cout << "uh oh" << std::endl;
+        color = "wrongcolor";
     }
-    std::cout << std::endl;
+    
+    std::cout << color << " has " << data.points << " victory points, " << data.hand.get() << std::endl;
+}
+
+void tcontroller::printcompletions(const PlayerData& data) {
+    // 'B', 'R', 'O', 'Y'
+    std::string color;
+    if (data.b->data[0].get() == &data) {
+        color = "Blue";
+    } else if (data.b->data[1].get() == &data) {
+        color = "Red";
+    } else if (data.b->data[2].get() == &data) {
+        color = "Orange";
+    } else if (data.b->data[3].get() == &data) {
+        color = "Yellow";
+    } else {
+        std::cout << "uh oh" << std::endl;
+    }
+
+    std::cout << color << " has completed:" << std::endl;
+    int idx;
+    for (Criteria* c : data.corners) {
+        for (int i = 0; i <= 53; ++i) { // 53 is max criterion index
+            if (data.b->criterions[i].get() == c) {
+                idx = i;
+            }
+        }
+        std::cout << idx << " " << data.b->criterions[idx].get()->getgreed() << std::endl;
+    }
+}
+
+controller& tcontroller::operator<<(const Hand& c) {
+    int numCaffeines = std::count(c.cards.begin(), c.cards.end(), Resource::CAFF);
+    int numLabs = std::count(c.cards.begin(), c.cards.end(), Resource::LAB);
+    int numLectures = std::count(c.cards.begin(), c.cards.end(), Resource::LEC);
+    int numTutorials = std::count(c.cards.begin(), c.cards.end(), Resource::TUT);
+    int numStudies = std::count(c.cards.begin(), c.cards.end(), Resource::STD);
+
+    std::cout << numCaffeines << " caffeines, "
+              << numLabs << " labs, "
+              << numLectures << " lectures, "
+              << numTutorials << " tutorials, and "
+              << numStudies << " studies." << std::endl;
+
     return *this;
 }
+
 controller& tcontroller::operator<<(const std::string& c){
     std::cout << c;
     return *this;
@@ -530,11 +590,6 @@ std:: cout << p->Name << ": " << std::endl;
 std::cout << " for ";
 *this << h2;
 std::cout << std::endl;
-}
-
-void tcontroller::accept(const Player* p) {
-
-    std::cout << p->Name << " DO YOU ACCEPT?  (enter y to accept)" << std::endl;
 }
 
 void tcontroller::reso(const Resource r){

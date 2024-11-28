@@ -19,6 +19,8 @@ class frenchTController: public controller{
         void turn(const Player& p, const int& i)override;
         void winner(const Player& p, const int& i)override;
         void showhand(const Hand& b, const Player& p)override;
+        void printstatus(const PlayerData& data) override;
+        void printcompletions(const PlayerData& data) override;
         controller& operator<<(const Resource resource) override;
         controller& operator<<(const std::vector<Resource> resources) override;
         controller& operator<<(const std::string& c) override;
