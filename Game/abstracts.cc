@@ -26,7 +26,7 @@ std::vector<Resource> getTileOrder(std::mt19937 *gen) {
 }
 
 std::vector<int> getTileOrder2(std::mt19937 *gen) {
-    std::vector<int> vec{2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12};
+    std::vector<int> vec{2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12};
     std::shuffle(vec.begin(), vec.end(), *gen);
     return vec;
 }
@@ -35,6 +35,7 @@ std::shared_ptr<Board> makeBoard(std::string name, std::shared_ptr<Player> playe
                     std::vector<Resource> tileorder, std::vector<int> tileorder2) {
     std::shared_ptr<Dice> d = std::make_shared<Dice>();
     std::shared_ptr<Goose> g = std::make_shared<Goose>();
+    tileorder2.emplace_back(7);
 
     int t = 0;
     int t2 = 0;
@@ -575,6 +576,7 @@ void PlayerData::turn(controller* cont) {
 
     cont->turn(*play, b->turn);
     *cont << controller::Commands::MENU;
+    *cont << *hand;
     while (turnActive) {
 
         
