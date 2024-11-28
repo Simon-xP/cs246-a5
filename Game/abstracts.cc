@@ -574,6 +574,7 @@ void PlayerData::turn(controller* cont) {
     // Start the player's turn by rolling the dice
     Player *play = b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [this](const std::shared_ptr<PlayerData>& p) {return p.get() == this;}))].get();
 
+    cont->board(*b);
     cont->turn(*play, b->turn);
     *cont << controller::Commands::MENU;
     *cont << *hand;
@@ -689,8 +690,8 @@ void PlayerData::turn(controller* cont) {
 }
 
 void firstTurn(Board* b, controller* cont) {
-    cont->board(*b);
     for (int i = 0; i < 4; ++i) {
+         cont->board(*b);
         PlayerData* player = b->data[i].get();
         Player* play = b->players[i].get();
         
