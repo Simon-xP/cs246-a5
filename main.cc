@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     bool hidden = false;
            collection col;
         if (argc > 0) {
-            char c = *argv[0];
+            char c = *argv[1];
             switch (c)
             {
             case 't':
@@ -34,8 +34,8 @@ int main(int argc, char *argv[]) {
         } else {
             col = collection('t');
         }
-    if (argc > 1) {
-        if (*argv[1] == 'H') {
+    if (argc > 2) {
+        if (*argv[2] == 'H') {
             hidden = true;
         }
     }

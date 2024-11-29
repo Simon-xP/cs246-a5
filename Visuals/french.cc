@@ -3,6 +3,7 @@
 #include "french.h"
 #include <vector>
 #include <algorithm>
+#include <sstream>
 #include "game.h"
 
 
@@ -350,11 +351,44 @@ controller& frenchTController::operator<<(const Commands c) {
             std::cout << "8. Quitter le jeu" << std::endl;
             std::cout << "Indiquez votre choix: \n";
             break;
-
+        case MENU2:
+            std::cout << "\nQue voulez-vous faire ?" << std::endl;
+            std::cout << "0. Charger un tableau" << std::endl;
+            std::cout << "1. Créer un nouveau tableau" << std::endl;
+            std::cout << "2. Ajouter un joueur" << std::endl;
+            std::cout << "3. Jouer" << std::endl;
+            std::cout << "4. Liste des joueurs" << std::endl;
+            std::cout << "5. Liste des tableaux" << std::endl;
+            std::cout << "6. Quitter" << std::endl;
+            std::cout << "Indiquez votre choix : \n";
+            break;
+        case VIEWCOMP:
+            std::cout << "Quel index de joueur souhaitez-vous consulter pour les réalisations ?\n";
+            break;
         case RESET:
             std::cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
             break;
-
+        case VIEWSTATUS:
+            std::cout << "Quel index de joueur souhaitez-vous consulter pour le statut ?\n";
+            break;
+        case OPENHAND:
+            std::cout << "Fichier ouvert avec succès\n";
+            break;
+        case NOBOARD:
+            std::cout << "Le tableau n'existe pas\n";
+            break;
+        case BOARDNAME:
+            std::cout << "Entrez un nom pour le tableau\n";
+            break;
+        case PLAYER:
+            std::cout << "Entrez un nom pour le joueur\n";
+            break;
+        case SEED:
+            std::cout << "Entrez un nombre pour la graine\n";
+            break;
+        case PASS:
+            std::cout << "Entrez un nouveau mot de passe\n";
+            break;
         case MOVEG:
             std::cout << "Sélectionnez une tuile (numéro entre 0 et 18) : ";
             break;
@@ -615,33 +649,35 @@ controller& frenchTController::operator>>(Action2& c){
 
 
 void frenchTController::boards(std::vector<pairing> boards) {
-    // std::cout << "Board Names: \n";
-    // for (auto i : boards){
-    //     std::cout << i->board->name << std::endl;
-    // }
+    std::cout << "Noms des tables : \n";
+    for (auto i : boards){
+        std::cout << i.board->name << std::endl;
+    }
 }
 
 void frenchTController::players(std::vector<std::shared_ptr<Player>> players) {
-    // std::cout << "Index-Player Names: \n";
-    // for (auto i : players){
-    //     std::cout << i->Name << std::endl;
-    // }
+    std::cout << "Noms des joueurs: \n";
+    for (auto i : players){
+        std::cout << i->Name << std::endl;
+    }
 }
 
 void frenchTController::recipes(){
-// std::cout << "Recipes: \n" << "Goal: Study + Tutorial \n" << "Assignnmet: Caffeine + Lab + Lecture + Tutorial \n" 
-// << "Exam: 2 Lecture + 3 Study \n" << "Final: 3 Caffeine + 2 Lab + 2 Lecture + Tutorial + 2 Stduy" << std::endl;
+    std::cout << "Recettes : \n"
+              << "Objectif : Étude + Tutoriel \n"
+              << "Devoir : Caféine + Labo + Cours + Tutoriel \n"
+              << "Examen : 2 Cours + 3 Étude \n"
+              << "Final : 3 Caféine + 2 Labo + 2 Cours + Tutoriel + 2 Étude" 
+              << std::endl;
 }
 
 void frenchTController::showshow(std::string lin){
-    // int a, b, c, d, e;
-    // std::stringstream ss{lin};
-    // ss >> a >> b >> c >> d >> e;
-    // std::cout << "Caffeine: " << a << " Lab: " << b << " Lecture: " << c << " Tutorial: " << d << " Study: " << e << std::endl;
+    int a, b, c, d, e;
+    std::stringstream ss{lin};
+    ss >> a >> b >> c >> d >> e;
+    std::cout << "\n\n\nCaféine: " << a << " Labo: " << b << " Lecture: " << c << " Tutoriel: " << d << " Cours: " << e << "\n" << std::endl;
 }
 
 void frenchTController::winner(std::string name){
-    // std::cout << "WINNER: " << name << std::endl;
+    std::cout << "GAGNANT: " << name << std::endl;
 }
-
-
