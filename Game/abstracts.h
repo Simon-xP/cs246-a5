@@ -29,6 +29,7 @@ class Goose {
 class Player{
     std::string password;
     public:
+        friend PlayerData;
         char colors[4] = {'B', 'R', 'O', 'Y'} ;
         std::string Name;
         Player(std::string name, std::string pass): password{pass},  Name{name}{}

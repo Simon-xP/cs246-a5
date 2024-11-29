@@ -457,6 +457,21 @@ void PlayerData::gain(Hand h){
     } else {
         can_steal = true;
     }
+    std::string text = std::to_string(herr(hand.get(), Resource::CAFF)) + " " +
+                       std::to_string(herr(hand.get(), Resource::LAB)) + " " +
+                       std::to_string(herr(hand.get(), Resource::LEC)) + " " +
+                       std::to_string(herr(hand.get(), Resource::STD)) + " " +
+                       std::to_string(herr(hand.get(), Resource::TUT));
+    Player* p = b->players[std::distance(b->data, std::find_if(b->data, b->data + 3, [this](const std::shared_ptr<PlayerData>& p) {return p.get() == this;}))].get();
+    std::string out = b->name + "_" + p->Name;
+    std::ofstream outFile(out); // Open file in write mode (overwrites if it exists)
+    if (outFile) {
+        outFile << p->password;
+        outFile << text; // Write the text to the file
+    } else {
+    }
+    outFile.close();
+
 }
 
 Tile* PlayerData::selectTargetTile(controller* cont) {

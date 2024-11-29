@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
         *col.screen  << controller::Commands::PLAYER;
         std::string c;
         *col.screen >> c;
-        col.gethand(c, boardname);
+        col.readhand(c, boardname);
         }
     }
      return 0;

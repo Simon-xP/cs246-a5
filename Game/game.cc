@@ -112,6 +112,7 @@ void collection::readhand(std::string player, std::string board){
 
         fileCheck.close();
         std::ifstream fileStream(filename);
+        std::getline(fileStream, password);
     if (!passed){
         *screen << controller::Commands::READHAND1;
         std::string pass;
@@ -145,7 +146,8 @@ std::string collection::gethand(std::string player, std::string board) {
         std::string lin;
         fileCheck.close();
         std::ifstream fileStream(filename);
-        fileStream >> lin >> lin;
+        getline(fileStream, lin);
+        getline(fileStream, lin);
         fileStream.close();
         return lin;
     } else {

@@ -739,7 +739,7 @@ void tcontroller::showshow(std::string lin){
     int a, b, c, d, e;
     std::stringstream ss{lin};
     ss >> a >> b >> c >> d >> e;
-    std::cout << "Caffeine: " << a << " Lab: " << b << " Lecture: " << c << " Tutorial: " << d << " Study: " << e << std::endl;
+    std::cout << "\n\n\nCaffeine: " << a << " Lab: " << b << " Lecture: " << c << " Tutorial: " << d << " Study: " << e << "\n" << std::endl;
 }
 
 void tcontroller::winner(std::string name){
