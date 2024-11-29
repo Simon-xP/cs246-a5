@@ -12,7 +12,7 @@
 int main(int argc, char *argv[]) {
     bool hidden = false;
            collection col;
-        if (argc > 0) {
+        if (argc > 1) {
             char c = *argv[1];
             switch (c)
             {
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
                 break;
             }
         } else {
-            col = collection('t');
+            col = collection('e');
         }
     if (argc > 2) {
         if (*argv[2] == 'H') {

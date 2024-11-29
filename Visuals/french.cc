@@ -506,7 +506,7 @@ controller& frenchTController::operator>>(Action& c){
     int temp;
     while (true){
         if (std::cin >> temp) {
-            if ((temp >= 0) && (temp <= 8)) {
+            if ((temp >= 0) && (temp <= 10)) {
                 c = static_cast<Action>(temp);
                 break;
             } else {
