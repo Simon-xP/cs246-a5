@@ -14,6 +14,7 @@ class Board;
 enum class Resource;
 class Dice;
 class PlayerData;
+struct pairing;
 
 enum Action {TRADE, ROLL, CRIT, GOAL, BOARD, SWITCH, STATUS, COMPLETIONS, END, SAVE, EXIT};
 
@@ -45,6 +46,11 @@ class controller {
         virtual controller& operator>>(Action& c) = 0;
         virtual controller& operator>>(int& c) = 0;
         virtual controller& operator>>(std::string& c) = 0;
+        virtual void boards(std::vector<std::shared_ptr<pairing>> boards) = 0;
+        virtual void players(std::vector<std::shared_ptr<Player>> players) = 0;
+        virtual void recipes() = 0;
+        virtual void showshow(std::string lin) = 0;
+
         
 };
 
@@ -72,6 +78,10 @@ class gcontroller: public controller{
         controller& operator>>(Action& c) override;
         controller& operator>>(int& c) override;
         controller& operator>>(std::string& c) override;
+        void boards(std::vector<std::shared_ptr<pairing>> boards) override;
+        void players(std::vector<std::shared_ptr<Player>> players) override;
+        void recipes() override;
+        void showshow(std::string lin) override;
 };
 
 class tcontroller: public controller{
@@ -96,6 +106,11 @@ class tcontroller: public controller{
         controller& operator>>(Action& c)override;
         controller& operator>>(int& c) override;
         controller& operator>>(std::string& c) override;
+        void boards(std::vector<std::shared_ptr<pairing>> boards) override;
+        void players(std::vector<std::shared_ptr<Player>> players) override;
+        void recipes() override;
+        void showshow(std::string lin) override;
+
 };
 
 

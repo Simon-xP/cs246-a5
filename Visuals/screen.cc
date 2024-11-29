@@ -2,6 +2,9 @@
 #include "course.h"
 #include <vector>
 #include <algorithm>
+#include "game.h"
+#include <sstream>
+#include <string>
 
 
 void tcontroller::chooseplayer(const Player* p[3]){
@@ -28,6 +31,8 @@ void tcontroller::board(const Board& b){
     int e = 0;
     int t = 0;
     int t2 = 0;
+    int t3 = 0;
+    int t4 = 0;
     bool long_space = false; 
     for (int i = 0; i < BOARD_ROWS; ++i) {
         std::cout << "\n";
@@ -53,9 +58,9 @@ void tcontroller::board(const Board& b){
 						std::cout << " --";
 					}else {
                         if (c < 10) {
-                        std::cout << "          ";
+                        std::cout << "         ";
                         } else {
-                            std::cout << "         ";
+                            std::cout << "        ";
                         }
                     }
                 }
@@ -67,7 +72,17 @@ void tcontroller::board(const Board& b){
                 if (j + 1 < BOARD_COLUMNS && layout.at(i).at(j+1) != ' ') {
                         std::cout << "-- ";
 					} else {
+                        if ((i + 1 < BOARD_ROWS) && (j + 2 < BOARD_COLUMNS) && layout.at(i+1).at(j+2) == 'T'){
+                            if (t3 < 10){
+                                std::cout << "       " << t3 << "       ";
+                                t3++;
+                            } else {
+                                std::cout << "       " << t3 << "      ";
+                                t3++;
+                            }
+                        } else {
                             std::cout << "               ";
+                        }
                     }
                 } else {
                     
@@ -76,9 +91,30 @@ void tcontroller::board(const Board& b){
 						std::cout << "-- ";
 					} else {
                         if (e < 10){
-                            std::cout <<" " << e << "               ";
+                            if ((i + 1 < BOARD_ROWS) && (j + 2 < BOARD_COLUMNS) && layout.at(i+1).at(j+2) == 'T'){
+                                if (t3 < 10){
+                                std::cout <<" " << e << "       " << t3 << "       ";
+                                t3++;
+                                } else {
+                                    std::cout <<" " << e << "       " << t3 << "      ";
+                                    t3++;
+                                }
+                            } else {
+                                std::cout <<" " << e << "               ";
+                            }
+                            
                         } else {
-                            std::cout << e << "               ";
+                            if ((i + 1 < BOARD_ROWS) && (j + 2 < BOARD_COLUMNS) && layout.at(i+1).at(j+2) == 'T'){
+                                if (t3 < 10){
+                                std::cout <<" " << e << "       " << t3 << "      ";
+                                t3++;
+                                } else {
+                                    std::cout <<" " << e << "      " << t3 << "      ";
+                                    t3++;
+                                }
+                            } else {
+                                std::cout <<" " << e << "              ";
+                            }
                         }
                     }
                 }
@@ -90,9 +126,9 @@ void tcontroller::board(const Board& b){
                         std::cout << 7 << "       ";
                     }
                     else if (b.tiles.at(t)->dieVal < 10) {
+                        std::cout << b.tiles.at(t)->dieVal << "         ";
+                    } else { 
                         std::cout << b.tiles.at(t)->dieVal << "        ";
-                    } else {
-                        std::cout << b.tiles.at(t)->dieVal << "       ";
                     }
                 } else{
                     std::cout <<"frick";
@@ -109,7 +145,7 @@ void tcontroller::board(const Board& b){
                 break;
 
             case '3':
-                std::cout << "                       ";
+                std::cout << "                      ";
                 break;
             case '4':
                 std::cout << "                    ";
@@ -146,9 +182,16 @@ void tcontroller::board(const Board& b){
             std::string prod_output = "";
 
             // Determine if there is a product to output
-            if ((j+2 < BOARD_COLUMNS && layout.at(i + 1).at(j+2) == 'T') || (j+3 < BOARD_COLUMNS && layout.at(i + 1).at(j+3) == 'T')) {
+            if ((j+2 < BOARD_COLUMNS && i+1 < BOARD_ROWS && layout.at(i + 1).at(j+2) == 'T') || (j+3 < BOARD_COLUMNS  && i+1 < BOARD_ROWS && layout.at(i + 1).at(j+3) == 'T')) {
                 if (t2 < 19){
                 prod_output = resour[static_cast<int>(b.tiles.at(t2)->res.prod)]; //b.tiles.at(t2)->res.prod; // Get the product
+                }
+            } else if ((j+3 < BOARD_COLUMNS)  && (layout.at(i).at(j+3) == 'T')) {
+                if (t4 < 19){
+                    if (b.tiles.at(t4)->goosed) {
+                        prod_output = "GEESE";
+                    }
+                    t4++;
                 }
             }
 
@@ -163,12 +206,12 @@ void tcontroller::board(const Board& b){
       
                     int base_space = long_space ? 18 : 14;
                     int adjusted_space; // Ensure no negative spaces
-                    if ((i > 0) && (i % 2 == 1) && (i < 19)){
+                    if (((i > 0) && (i % 2 == 1) && (i < 19)) || (prod_output == "GEESE")){
                         adjusted_space = base_space - static_cast<int>(prod_output.size());
                         adjusted_space = std::max(0, adjusted_space); // Ensure no negative spaces
                         std::cout << std::string((adjusted_space)/2, ' ');
                         std::cout << prod_output;
-                        if (prod_output != "") {
+                        if (prod_output != "" && prod_output != "GEESE") {
                             ++t2;
                         }
                         std::cout << std::string((adjusted_space+1)/2, ' ');
@@ -606,5 +649,31 @@ void ResourceCollection::inputResources(controller* cont) {
         cont->reso(static_cast<Resource>(i));
         *cont >> resources[i];
     }
+}
+
+void tcontroller::boards(std::vector<std::shared_ptr<pairing>> boards) {
+    std::cout << "Board Names: \n";
+    for (auto i : boards){
+        std::cout << i->board->name << std::endl;
+    }
+}
+
+void tcontroller::players(std::vector<std::shared_ptr<Player>> players) {
+    std::cout << "Player Names: \n";
+    for (auto i : players){
+        std::cout << i->Name << std::endl;
+    }
+}
+
+void tcontroller::recipes(){
+std::cout << "Recipes: \n" << "Goal: Study + Tutorial \n" << "Assignnmet: Caffeine + Lab + Lecture + Tutorial \n" 
+<< "Exam: 2 Lecture + 3 Study \n" << "Final: 3 Caffeine + 2 Lab + 2 Lecture + Tutorial + 2 Stduy" << std::endl;
+}
+
+void tcontroller::showshow(std::string lin){
+    int a, b, c, d, e;
+    std::stringstream ss{lin};
+    ss >> a >> b >> c >> d >> e;
+    std::cout << "Caffeine: " << a << " Lab: " << b << " Lecture: " << c << " Tutorial: " << d << " Study: " << e << std::endl;
 }
 

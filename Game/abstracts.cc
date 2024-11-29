@@ -704,6 +704,10 @@ void PlayerData::turn(controller* cont) {
                 *cont << controller::Commands::MENU;
                 break;
             }
+            case Action::EXIT: {
+                throw std::runtime_error("Turn Done");
+                break;
+            }
             default:
                 *cont << controller::Commands::MENU;
         }
