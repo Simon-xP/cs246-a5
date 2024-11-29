@@ -589,11 +589,10 @@ void PlayerData::turn(controller* cont) {
     cont->board(*b);
     cont->turn(*play, b->turn);
     *cont << controller::Commands::MENU;
-    *cont << *hand;
+    Action act;
     while (turnActive) {
 
         
-        Action act;
         *cont >> act;
 
         switch (act) {

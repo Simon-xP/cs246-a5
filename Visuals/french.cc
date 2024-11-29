@@ -3,6 +3,7 @@
 #include "french.h"
 #include <vector>
 #include <algorithm>
+#include "game.h"
 
 
 void frenchTController::chooseplayer(const Player* p[3]){
@@ -591,3 +592,56 @@ void frenchTController::printcompletions(const PlayerData& data) {
         std::cout << idx << " " << data.b->criterions[idx].get()->getgreed() << std::endl;
     }
 }
+
+
+controller& frenchTController::operator>>(Action2& c){
+    int temp;
+    while (true){
+        if (std::cin >> temp) {
+            if ((temp >= 0) && (temp <= 5)) {
+                c = static_cast<Action2>(temp);
+                break;
+            } else {
+                *this << INVALIDNUM;
+            }
+            
+        } else {
+            std::cin.clear();
+            std::cin.ignore();
+        }
+    }
+    return *this;
+}
+
+
+void frenchTController::boards(std::vector<pairing> boards) {
+    // std::cout << "Board Names: \n";
+    // for (auto i : boards){
+    //     std::cout << i->board->name << std::endl;
+    // }
+}
+
+void frenchTController::players(std::vector<std::shared_ptr<Player>> players) {
+    // std::cout << "Index-Player Names: \n";
+    // for (auto i : players){
+    //     std::cout << i->Name << std::endl;
+    // }
+}
+
+void frenchTController::recipes(){
+// std::cout << "Recipes: \n" << "Goal: Study + Tutorial \n" << "Assignnmet: Caffeine + Lab + Lecture + Tutorial \n" 
+// << "Exam: 2 Lecture + 3 Study \n" << "Final: 3 Caffeine + 2 Lab + 2 Lecture + Tutorial + 2 Stduy" << std::endl;
+}
+
+void frenchTController::showshow(std::string lin){
+    // int a, b, c, d, e;
+    // std::stringstream ss{lin};
+    // ss >> a >> b >> c >> d >> e;
+    // std::cout << "Caffeine: " << a << " Lab: " << b << " Lecture: " << c << " Tutorial: " << d << " Study: " << e << std::endl;
+}
+
+void frenchTController::winner(std::string name){
+    // std::cout << "WINNER: " << name << std::endl;
+}
+
+

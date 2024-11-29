@@ -13,7 +13,8 @@ collection::collection(char f){
         screen = std::make_shared<frenchTController>();
         break;
     case 'g':
-        screen = std::make_shared<gcontroller>();
+        //screen = std::make_shared<gcontroller>();
+        screen = std::make_shared<tcontroller>(); //temp just text
         break;
 
     default:
@@ -26,7 +27,7 @@ void collection::bringin(std::string file, std::string name, int seed, std::stri
     std::shared_ptr<Player> ps[4]{nullptr, nullptr, nullptr, nullptr};
     for (int i = 0; i < 4; i++) {
         for (auto j : players) {
-            if (j->Name == p[4]) {
+            if (j->Name == p[i]) {
                 ps[i] = j;
                 break;
             }
@@ -48,7 +49,7 @@ void collection::generate(std::string name, int seed, std::string p[4]){
     std::shared_ptr<Player> ps[4]{nullptr, nullptr, nullptr, nullptr};
     for (int i = 0; i < 4; i++) {
         for (auto j : players) {
-            if (j->Name == p[4]) {
+            if (j->Name == p[i]) {
                 ps[i] = j;
                 break;
             }
@@ -68,13 +69,14 @@ void collection::generate(std::string name, int seed, std::string p[4]){
 void collection::play(std::string board){
     Board* b = nullptr;
     for (auto i : boards) {
-        if (i->board->name == board) {
-            b = i->board.get();
+        if (i.board->name == board) {
+            b = i.board.get();
             break;
         }
     }
     if (!b) {
-        throw std::runtime_error("Board Doesnt Exist");
+        *screen << controller::Commands::NOBOARD;
+        return;
     }
     bool running = true;
     if (b->turn == 0) {
@@ -86,7 +88,7 @@ void collection::play(std::string board){
             run_turn(b, screen.get());
             for (auto i : b->data) {  
                 if (i->points >= 10) {
-                    std::cout << "WINNER: " << b->players[std::distance(b->data, std::find(b->data, b->data + 3, i))]->Name << std::endl;
+                    screen->winner(b->players[std::distance(b->data, std::find(b->data, b->data + 3, i))]->Name);
                 }
             }
         }
@@ -113,7 +115,7 @@ void collection::readhand(std::string player, std::string board){
     if (!passed){
         *screen << controller::Commands::READHAND1;
         std::string pass;
-        screen >> pass;
+        *screen >> pass;
         if (pass == password) {
             passed = true; 
         } else {

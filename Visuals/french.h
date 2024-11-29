@@ -7,7 +7,9 @@
 #include "../Game/abstracts.h"
 #include "window.h"
 #include "gui.h"
+#include "../Game/game.h"
 #include "screen.h"
+struct pairing;
 
 class frenchTController: public controller{
     public:
@@ -31,6 +33,12 @@ class frenchTController: public controller{
         controller& operator>>(Action& c)override;
         controller& operator>>(int& c) override;
         controller& operator>>(std::string& c) override;
+        controller& operator>>(Action2& c) override;
+        void boards(std::vector<pairing> boards) override;
+        void players(std::vector<std::shared_ptr<Player>> players) override;
+        void recipes() override;
+        void showshow(std::string lin) override;
+        void winner(std::string name) override;
 };
 
 #endif

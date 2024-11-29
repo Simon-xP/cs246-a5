@@ -17,7 +17,7 @@ class PlayerData;
 struct pairing;
 
 enum Action {TRADE, ROLL, CRIT, GOAL, BOARD, SWITCH, STATUS, COMPLETIONS, END, SAVE, EXIT};
-
+enum Action2 {LOAD, MAKE, ADDPLAY, PLAY, PLAYERS, BOARDS, EX};
 class controller {
     protected:
         enum Controltypes {TEXT, GRAPHIC};
@@ -25,7 +25,8 @@ class controller {
     public:
         enum Commands {MENU, RESET, MOVEG, TRADE1, TRADE2, STEAL, FIRSTGOAL, FIRSTCRIT, CHOOSECRIT, CHOOSEGOAL,
         INVALIDGOAL, INVALIDCRIT, INVALIDPLAYER, ROLL, SAVEBOARD, END, AFDGOAL, AFDCRIT, INVALIDNUM, NOPLAY, ALRROLL, TRADE3, INVTRADE,
-        RES, MUST, PICK, SFILENAME, VIEWCOMP, VIEWSTATUS};
+        RES, MUST, PICK, SFILENAME, VIEWCOMP, VIEWSTATUS, OPENHAND, READHAND1, READHANDF, NOHAND, READHAND2, NOBOARD, BOARDNAME, PLAYER, SEED,
+        MENU2, PASS};
         virtual void chooseplayer(const Player* p[3]) = 0;
         virtual void offer(const Player* p, Hand& h1, Hand& h2) = 0;
         virtual void accept(const Player* p) = 0;
@@ -44,12 +45,14 @@ class controller {
         virtual controller& operator<<(const Dice& c) = 0;
         virtual controller& operator<<(const PlayerData& player) = 0;
         virtual controller& operator>>(Action& c) = 0;
+        virtual controller& operator>>(Action2& c) = 0;
         virtual controller& operator>>(int& c) = 0;
         virtual controller& operator>>(std::string& c) = 0;
-        virtual void boards(std::vector<std::shared_ptr<pairing>> boards) = 0;
+        virtual void boards(std::vector<pairing> boards) = 0;
         virtual void players(std::vector<std::shared_ptr<Player>> players) = 0;
         virtual void recipes() = 0;
         virtual void showshow(std::string lin) = 0;
+        virtual void winner(std::string name) = 0;
 
         
 };
@@ -76,12 +79,14 @@ class gcontroller: public controller{
         controller& operator<<(const Dice& c)override;
         controller& operator<<(const PlayerData& player) override;
         controller& operator>>(Action& c) override;
+        controller& operator>>(Action2& c) override;
         controller& operator>>(int& c) override;
         controller& operator>>(std::string& c) override;
-        void boards(std::vector<std::shared_ptr<pairing>> boards) override;
+        void boards(std::vector<pairing> boards) override;
         void players(std::vector<std::shared_ptr<Player>> players) override;
         void recipes() override;
         void showshow(std::string lin) override;
+        void winner(std::string name) override;
 };
 
 class tcontroller: public controller{
@@ -104,12 +109,14 @@ class tcontroller: public controller{
         controller& operator<<(const Dice& c)override;
         controller& operator<<(const PlayerData& player) override;
         controller& operator>>(Action& c)override;
+        controller& operator>>(Action2& c) override;
         controller& operator>>(int& c) override;
         controller& operator>>(std::string& c) override;
-        void boards(std::vector<std::shared_ptr<pairing>> boards) override;
+        void boards(std::vector<pairing> boards) override;
         void players(std::vector<std::shared_ptr<Player>> players) override;
         void recipes() override;
         void showshow(std::string lin) override;
+        void winner(std::string name) override;
 
 };
 

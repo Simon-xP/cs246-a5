@@ -2,7 +2,7 @@
 #include "course.h"
 #include <vector>
 #include <algorithm>
-#include "game.h"
+#include "../Game/game.h"
 #include <sstream>
 #include <string>
 
@@ -311,8 +311,12 @@ void tcontroller::board(const Board& b){
 }
 
 void tcontroller::turn(const Player& p, const int& i){
-    std::cout << "\n--- TURN " << i << " ---" << std::endl;
-    std::cout << "\n--- Player " << p.Name << "'s Turn ---" << std::endl;
+    std::cout << "\n--- TURN " << i <<" ---" << std::endl;
+    if (i != 0) {
+    std::cout << "\n--- Player " << p.Name << " ("<< p.colors[i%4]<< ") " << "'s Turn ---" << std::endl;
+    } else {
+        std::cout << "\n--- Player " << p.Name << "'s Turn ---" << std::endl;
+    }
 }
 
 controller& tcontroller::operator<<(const PlayerData& player) {
@@ -391,6 +395,17 @@ controller& tcontroller::operator<<(const Commands c) {
             std::cout << "8. End turn" << std::endl;
             std::cout << "9. Save" << std::endl;
             std::cout << "10. Leave Game" << std::endl;
+            std::cout << "Enter your choice: \n";
+            break;
+        case MENU2:
+            std::cout << "\nWhat would you like to do?" << std::endl;
+            std::cout << "0. Load Board" << std::endl;
+            std::cout << "1. Make New Board" << std::endl;
+            std::cout << "2. Add Player" << std::endl;
+            std::cout << "3. Play Game" << std::endl;
+            std::cout << "4. Player List" << std::endl;
+            std::cout << "5. Boards List" << std::endl;
+            std::cout << "6. Exit" << std::endl;
             std::cout << "Enter your choice: \n";
             break;
 
@@ -499,6 +514,36 @@ controller& tcontroller::operator<<(const Commands c) {
         case VIEWSTATUS: 
             std::cout << "Which player index do you want to view the status of?\n";
             break;
+        case OPENHAND: 
+            std::cout << "File Opened Success\n";
+            break;
+        case READHAND1: 
+            std::cout << "Enter Password\n";
+            break;
+        case READHANDF: 
+            std::cout << "Wrong Password\n";
+            break;
+        case NOHAND: 
+            std::cout << "Could Not Find File\n";
+            break;
+        case READHAND2: 
+            std::cout << "Type q to exit and anything else to reload hand\n";
+            break;
+        case NOBOARD: 
+            std::cout << "Board Does Not Exist\n";
+            break;
+        case BOARDNAME: 
+            std::cout << "Enter Name for Board\n";
+            break;
+        case PLAYER: 
+            std::cout << "Enter Name for Player\n";
+            break;
+        case SEED: 
+            std::cout << "Enter Number for Seed\n";
+            break;
+        case PASS: 
+            std::cout << "Enter a new Password\n";
+            break;
         default:
             std::cout << "Unknown command!" << std::endl;
             break;
@@ -521,8 +566,9 @@ void tcontroller::printstatus(const PlayerData& data) {
         std::cout << "uh oh" << std::endl;
         color = "wrongcolor";
     }
-    
-    std::cout << color << " has " << data.points << " victory points, " << data.hand.get() << std::endl;
+    std::cout << color << " has " << data.points << " victory points, ";
+    *this << *data.hand.get();
+    std::cout<< std::endl;
 }
 
 void tcontroller::printcompletions(const PlayerData& data) {
@@ -597,6 +643,25 @@ controller& tcontroller::operator>>(Action& c){
     return *this;
 }
 
+controller& tcontroller::operator>>(Action2& c){
+    int temp;
+    while (true){
+        if (std::cin >> temp) {
+            if ((temp >= 0) && (temp <= 6)) {
+                c = static_cast<Action2>(temp);
+                break;
+            } else {
+                *this << INVALIDNUM;
+            }
+            
+        } else {
+            std::cin.clear();
+            std::cin.ignore();
+        }
+    }
+    return *this;
+}
+
 controller& tcontroller::operator>>(int& c){
     int temp;
     while (true){
@@ -651,15 +716,15 @@ void ResourceCollection::inputResources(controller* cont) {
     }
 }
 
-void tcontroller::boards(std::vector<std::shared_ptr<pairing>> boards) {
+void tcontroller::boards(std::vector<pairing> boards) {
     std::cout << "Board Names: \n";
     for (auto i : boards){
-        std::cout << i->board->name << std::endl;
+        std::cout << i.board->name << std::endl;
     }
 }
 
 void tcontroller::players(std::vector<std::shared_ptr<Player>> players) {
-    std::cout << "Player Names: \n";
+    std::cout << "Index-Player Names: \n";
     for (auto i : players){
         std::cout << i->Name << std::endl;
     }
@@ -675,5 +740,9 @@ void tcontroller::showshow(std::string lin){
     std::stringstream ss{lin};
     ss >> a >> b >> c >> d >> e;
     std::cout << "Caffeine: " << a << " Lab: " << b << " Lecture: " << c << " Tutorial: " << d << " Study: " << e << std::endl;
+}
+
+void tcontroller::winner(std::string name){
+    std::cout << "WINNER: " << name << std::endl;
 }
 
